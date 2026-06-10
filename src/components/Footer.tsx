@@ -28,9 +28,9 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-[#070b13] border-t border-gray-200 dark:border-gray-800/80 transition-colors duration-300">
+    <footer className="relative bg-white/60 dark:bg-slate-950/40 backdrop-blur-md border-t border-slate-200/30 dark:border-white/5 transition-all duration-300">
       {/* Subtle top ambient glowing line in dark mode */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary-500/30 to-transparent dark:via-primary-400/20" />
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">

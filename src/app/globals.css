@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-primary-50: #f0f7f9;
@@ -18,20 +18,20 @@
 }
 
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #030712;
-    --foreground: #f9fafb;
+    --background: #060814;
+    --foreground: #f8fafc;
   }
 }
 
 :root[class~="dark"] {
-  --background: #030712;
-  --foreground: #f9fafb;
+  --background: #060814;
+  --foreground: #f8fafc;
 }
 
 body {
@@ -39,6 +39,53 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism Styles */
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.03);
+}
+
+.dark .glass-panel {
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card {
+  background-color: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .glass-card {
+  background-color: rgba(30, 41, 59, 0.25);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(53, 126, 155, 0.3);
+  box-shadow: 0 12px 30px -10px rgba(53, 126, 155, 0.15);
+  transform: translateY(-2px);
+}
+
+.dark .glass-card:hover {
+  border-color: rgba(53, 126, 155, 0.5);
+  box-shadow: 0 12px 30px -10px rgba(53, 126, 155, 0.35);
+  transform: translateY(-2px);
 }
 
 /* Custom Scrollbar */
@@ -116,15 +163,21 @@ body {
 /* Premium Map Popup Overrides (Leaflet) */
 .premium-popup-container .leaflet-popup-content-wrapper {
   padding: 0 !important;
-  border-radius: 0.75rem !important; /* rounded-xl */
+  border-radius: 1rem !important; /* rounded-2xl */
   overflow: hidden !important;
-  border: 1px solid #e5e7eb;
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15) !important;
   width: 90vw !important;
   max-width: 400px !important;
 }
 
 .dark .premium-popup-container .leaflet-popup-content-wrapper {
-  border-color: #374151; /* gray-700 */
+  background-color: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4) !important;
 }
 
 .premium-popup-container .leaflet-popup-content {
@@ -139,18 +192,20 @@ body {
 }
 
 .premium-popup-container .leaflet-popup-tip {
-  background: white;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
 }
 
 .dark .premium-popup-container .leaflet-popup-tip {
-  background: #111827; /* gray-900 */
+  background: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Leaflet dark mode overrides */
 .dark .leaflet-popup-content-wrapper,
 .dark .leaflet-popup-tip {
-  background-color: #111827; /* gray-900 */
-  color: #f9fafb;
+  color: #f8fafc;
 }
 
 /* Ensure the map tiles look a bit darker to match dark mode */

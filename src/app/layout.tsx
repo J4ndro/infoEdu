@@ -90,13 +90,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.className} bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col min-h-screen transition-colors`}>
+      <body className={`${inter.className} bg-slate-50 dark:bg-[#060814] text-slate-900 dark:text-slate-100 flex flex-col min-h-screen transition-colors relative overflow-x-hidden`}>
+        {/* Ambient background glow elements for Glassmorphism */}
+        <div className="fixed top-[-5%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-500/10 dark:bg-purple-600/15 blur-[120px] pointer-events-none z-0" />
+        <div className="fixed top-[20%] right-[-10%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-blue-500/10 dark:bg-blue-600/10 blur-[110px] pointer-events-none z-0" />
+        <div className="fixed bottom-[20%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-emerald-500/5 dark:bg-emerald-600/5 blur-[130px] pointer-events-none z-0" />
+        <div className="fixed bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px] rounded-full bg-pink-500/10 dark:bg-pink-600/10 blur-[100px] pointer-events-none z-0" />
+
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Header />
-          <main className="flex-grow flex flex-col">
-            {children}
-          </main>
-          <Footer />
+          <div className="relative z-10 flex flex-col min-h-screen w-full">
+            <Header />
+            <main className="flex-grow flex flex-col relative z-10">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>

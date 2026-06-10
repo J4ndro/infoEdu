@@ -39,14 +39,14 @@ export default function FAQ() {
   };
 
   return (
-    <section className="py-16 bg-white dark:bg-gray-900 transition-colors border-t border-gray-100 dark:border-gray-800">
+    <section id="faq" className="py-16 bg-transparent border-t border-slate-200/30 dark:border-white/5 transition-all">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold uppercase tracking-wider mb-4 border border-primary-100 dark:border-primary-800">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 text-primary-700 dark:text-primary-300 text-xs font-bold uppercase tracking-wider mb-4 border border-primary-500/20 dark:border-primary-500/10 shadow-sm">
             <HelpCircle className="w-4 h-4" />
             Preguntas Frecuentes
           </div>
@@ -59,7 +59,7 @@ export default function FAQ() {
           {faqs.map((faq, index) => (
             <div 
               key={index}
-              className="group border border-gray-100 dark:border-gray-800 rounded-2xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800 transition-all shadow-sm"
+              className="glass-card group rounded-2xl overflow-hidden cursor-pointer"
             >
               <button
                 className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
