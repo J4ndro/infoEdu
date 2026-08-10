@@ -289,7 +289,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
         <div className="text-center pt-12 pb-8 px-4 shrink-0 max-w-4xl mx-auto animate-fade-in-up">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4 leading-tight">
             Busca tu centro educativo en la <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 via-primary-500 to-indigo-400 dark:from-primary-400 dark:via-primary-500 dark:to-indigo-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#e59829] dark:from-primary-400 dark:via-amber-400 dark:to-amber-300">
               Comunitat Valenciana
             </span>
           </h2>
@@ -302,15 +302,15 @@ export default function Directory({ initialCenters }: DirectoryProps) {
       <div className="p-4 shrink-0 transition-colors z-10 relative bg-transparent">
         <div className="max-w-7xl mx-auto">
           <div className="relative glass-panel rounded-2xl p-6 transition-all">
-            {/* Decorative top border */}
-            <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-primary-600 via-primary-400 to-primary-200 rounded-t-2xl"></div>
+            {/* Decorative top border matching logo colors (Teal to Orange) */}
+            <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#f59e0b] rounded-t-2xl"></div>
             <div className="flex flex-wrap gap-3 items-stretch">
               <div className="relative flex-grow min-w-[200px]">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-400" />
                 <input
                   type="text"
                   placeholder="Buscar centro..."
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-slate-900/30 focus:bg-white/60 dark:focus:bg-slate-900/60 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white placeholder:text-slate-400"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white placeholder:text-slate-400 shadow-xs"
                   value={localQuery}
                   onChange={(e) => setLocalQuery(e.target.value)}
                 />
@@ -320,7 +320,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 <input
                   type="text"
                   placeholder="Código postal"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-slate-900/30 focus:bg-white/60 dark:focus:bg-slate-900/60 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white placeholder:text-slate-400"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white placeholder:text-slate-400 shadow-xs"
                   value={localZipCode}
                   onChange={(e) => setLocalZipCode(e.target.value)}
                 />
@@ -328,12 +328,12 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               
               <button 
                 onClick={handleLocationClick}
-                className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl border transition-all text-sm font-bold whitespace-nowrap shadow-sm hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${
+                className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl border transition-all text-sm font-bold whitespace-nowrap shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${
                   userLocation 
-                    ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20' 
+                    ? 'border-amber-500/50 bg-amber-500/15 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25' 
                     : isLocating 
-                      ? 'border-primary-500/50 bg-primary-500/15 text-primary-700 dark:text-primary-400' 
-                      : 'border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-white/5 hover:bg-white/50 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300'
+                      ? 'border-amber-500/50 bg-amber-500/15 text-amber-700 dark:text-amber-400' 
+                      : 'border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-gray-700 dark:text-gray-300'
                 }`}
               >
                 <Navigation className={`w-4 h-4 ${isLocating ? 'animate-pulse' : ''}`} /> 
@@ -342,16 +342,16 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               
               <button 
                 onClick={handleShare}
-                className="hidden sm:flex items-center justify-center w-12 rounded-xl border border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-white/5 hover:bg-white/50 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-all shadow-sm hover:-translate-y-0.5 cursor-pointer"
+                className="hidden sm:flex items-center justify-center w-12 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-all shadow-xs hover:-translate-y-0.5 cursor-pointer"
                 title="Compartir esta búsqueda"
               >
                 <Share2 className="w-4 h-4" />
               </button>
 
-              <div className="flex bg-slate-200/50 dark:bg-white/5 p-1 rounded-xl transition-all border border-slate-250/20 dark:border-white/5 shrink-0">
+              <div className="flex bg-slate-200/60 dark:bg-white/5 p-1 rounded-xl transition-all border border-slate-200/50 dark:border-white/5 shrink-0">
                 <button
                   onClick={() => setParam('view', 'list')}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white dark:bg-slate-800 text-primary-700 dark:text-primary-400 shadow-sm border border-black/5 dark:border-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'list' ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs border border-amber-400/30' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                   aria-label="Ver en modo lista"
                   title="Vista de lista"
                 >
@@ -359,7 +359,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 </button>
                 <button
                   onClick={() => setParam('view', 'map')}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'map' ? 'bg-white dark:bg-slate-800 text-primary-700 dark:text-primary-400 shadow-sm border border-black/5 dark:border-white/5' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'map' ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs border border-amber-400/30' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                   aria-label="Ver en modo mapa"
                   title="Vista de mapa"
                 >
@@ -373,47 +373,47 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Provincia</label>
                 <select 
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-slate-900/30 focus:bg-white/60 dark:focus:bg-slate-900/60 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
                   value={selectedProvince}
                   onChange={(e) => setParam('prov', e.target.value)}
                 >
-                  <option value="">Todas las provincias</option>
-                  <option value="ALICANTE/ALACANT">Alicante</option>
-                  <option value="CASTELLÓN/CASTELLÓ">Castellón</option>
-                  <option value="VALENCIA/VALÈNCIA">Valencia</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todas las provincias</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="ALICANTE/ALACANT">Alicante</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="CASTELLÓN/CASTELLÓ">Castellón</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="VALENCIA/VALÈNCIA">Valencia</option>
                 </select>
               </div>
               
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Tipo</label>
                 <select 
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-slate-900/30 focus:bg-white/60 dark:focus:bg-slate-900/60 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
                   value={selectedLevel}
                   onChange={(e) => setParam('level', e.target.value)}
                 >
-                  <option value="">Todos los niveles</option>
-                  <option value="Infantil">Infantil</option>
-                  <option value="Primaria">Primaria</option>
-                  <option value="ESO">ESO</option>
-                  <option value="Bachillerato">Bachillerato</option>
-                  <option value="FP">Formación Profesional</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todos los niveles</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Infantil">Infantil</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Primaria">Primaria</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="ESO">ESO</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Bachillerato">Bachillerato</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="FP">Formación Profesional</option>
                 </select>
               </div>
               
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Titularidad</label>
                 <select 
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200/50 dark:border-white/10 bg-white/30 dark:bg-slate-900/30 focus:bg-white/60 dark:focus:bg-slate-900/60 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
                   value={selectedTitularidad}
                   onChange={(e) => setParam('tit', e.target.value)}
                 >
-                  <option value="">Todos</option>
-                  <option value="Público">Público</option>
-                  <option value="Privado">Privado</option>
-                  <option value="Concertado">Concertado</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todos</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Público">Público</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Privado">Privado</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Concertado">Concertado</option>
                 </select>
               </div>
             </div>
@@ -443,9 +443,9 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                       value={selectedFamily}
                       onChange={(e) => setParam('family', e.target.value)}
                     >
-                      <option value="">Todas</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todas</option>
                       {allFamilies.map(family => (
-                        <option key={family} value={family}>{family}</option>
+                        <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" key={family} value={family}>{family}</option>
                       ))}
                     </select>
                   </div>
@@ -457,10 +457,10 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                       value={selectedFpGrade}
                       onChange={(e) => setParam('fp', e.target.value)}
                     >
-                      <option value="">Todos</option>
-                      <option value="FP Básica">FP Básica</option>
-                      <option value="Grado Medio">Grado Medio</option>
-                      <option value="Grado Superior">Grado Superior</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todos</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="FP Básica">FP Básica</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Grado Medio">Grado Medio</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Grado Superior">Grado Superior</option>
                     </select>
                   </div>
                 </div>
@@ -490,7 +490,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredCenters.map(center => (
                   <div key={center.id} className="glass-card group relative rounded-2xl overflow-hidden flex flex-col h-full animate-fade-in-up">
-                    <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-primary-600 via-primary-450 to-primary-200"></div>
+                    <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#f59e0b]"></div>
                     
                     <div className="p-6 flex-grow flex flex-col pt-7">
                       <div className="flex justify-between items-start mb-4">
@@ -508,16 +508,16 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                       </div>
                       
                       <div className="mb-5 flex flex-col justify-center min-h-[4rem]">
-                        <h3 className="text-xl font-black text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors line-clamp-2 tracking-tight leading-none">{center.name}</h3>
+                        <h3 className="text-xl font-black text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 tracking-tight leading-none">{center.name}</h3>
                       </div>
                       
                       <div className="space-y-3 mb-6 flex-grow">
                         <div className="flex items-start gap-3 text-gray-600 dark:text-gray-400 group/item">
-                          <div className="p-1.5 bg-primary-700 dark:bg-primary-600 rounded-md shrink-0 mt-0.5 shadow-sm">
+                          <div className="p-1.5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-md shrink-0 mt-0.5 shadow-xs">
                             <MapPin className="w-4 h-4 text-white" />
                           </div>
                           <p className="text-[15px] font-medium leading-relaxed line-clamp-2">
-                            <span className="font-bold text-primary-700 dark:text-primary-400 block text-xs uppercase tracking-wider mb-0.5 opacity-80">Ubicación</span>
+                            <span className="font-bold text-amber-700 dark:text-amber-400 block text-xs uppercase tracking-wider mb-0.5 opacity-80">Ubicación</span>
                             {center.municipality} <span className="text-gray-400 dark:text-gray-500 font-normal">({center.province.split('/')[0]})</span>
                           </p>
                         </div>
@@ -526,7 +526,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                       <div className="pt-4 border-t border-slate-200/30 dark:border-white/5">
                         <div className="flex flex-wrap gap-2">
                           {center.levels.map(lvl => (
-                            <span key={lvl} className="px-2.5 py-1 bg-primary-500/10 text-primary-700 dark:text-primary-300 text-xs font-bold rounded-md border border-primary-500/20 dark:border-primary-500/10 shadow-sm">
+                            <span key={lvl} className="px-2.5 py-1 bg-amber-500/10 text-amber-800 dark:text-amber-300 text-xs font-bold rounded-md border border-amber-500/20 dark:border-amber-500/10 shadow-xs">
                               {lvl === 'FP' ? 'Form. Profesional' : lvl}
                             </span>
                           ))}
@@ -535,7 +535,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     </div>
                     
                     <div className="p-4 bg-slate-550/10 dark:bg-white/5 border-t border-slate-200/30 dark:border-white/5 mt-auto">
-                      <Link href={`/centro/${center.id}`} className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white shadow-lg shadow-primary-600/20 hover:shadow-primary-600/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
+                      <Link href={`/centro/${center.id}`} className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
                         Explorar centro
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </Link>

@@ -149,8 +149,8 @@ export default async function CentroPage({ params }: { params: Promise<{ id: str
             
             {/* Header Card */}
             <div className="glass-panel rounded-2xl p-6 md:p-8 relative">
-              {/* Decorative Top Gradient */}
-              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-primary-600 via-primary-450 to-primary-200 rounded-t-2xl"></div>
+              {/* Decorative Top Gradient matching logo */}
+              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#f59e0b] rounded-t-2xl"></div>
 
               <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div className="flex-1 min-w-0 pt-2">
@@ -181,7 +181,7 @@ export default async function CentroPage({ params }: { params: Promise<{ id: str
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${center.name}, ${center.address}, ${center.municipality}`)}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold transition-all shadow-md hover:-translate-y-0.5 cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold transition-all shadow-md shadow-amber-500/25 hover:-translate-y-0.5 cursor-pointer"
                     >
                       <MapPin className="w-4 h-4" />
                       Abrir en Google Maps
@@ -353,7 +353,7 @@ export default async function CentroPage({ params }: { params: Promise<{ id: str
                       <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
                       <p className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wide">Ubicación</p>
                     </div>
-                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${center.name}, ${center.address}, ${center.municipality}`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-700 dark:bg-primary-600 hover:bg-primary-600 dark:hover:bg-primary-500 text-white transition-all text-xs font-bold shadow-md hover:-translate-y-0.5 cursor-pointer">
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${center.name}, ${center.address}, ${center.municipality}`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white transition-all text-xs font-bold shadow-md shadow-amber-500/20 hover:-translate-y-0.5 cursor-pointer">
                         Abrir en Maps
                     </a>
                   </div>

@@ -90,12 +90,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.className} bg-slate-50 dark:bg-[#060814] text-slate-900 dark:text-slate-100 flex flex-col min-h-screen transition-colors relative overflow-x-hidden`}>
-        {/* Ambient background glow elements for Glassmorphism */}
-        <div className="fixed top-[-5%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-purple-500/10 dark:bg-purple-600/15 blur-[120px] pointer-events-none z-0" />
-        <div className="fixed top-[20%] right-[-10%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-blue-500/10 dark:bg-blue-600/10 blur-[110px] pointer-events-none z-0" />
-        <div className="fixed bottom-[20%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-emerald-500/5 dark:bg-emerald-600/5 blur-[130px] pointer-events-none z-0" />
-        <div className="fixed bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px] rounded-full bg-pink-500/10 dark:bg-pink-600/10 blur-[100px] pointer-events-none z-0" />
+      <body className={`${inter.className} bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-[#060814] dark:to-[#060814] text-slate-900 dark:text-slate-100 flex flex-col min-h-screen transition-colors relative overflow-x-hidden`}>
+        {/* Ambient background glow elements for Liquid Glass Effect with Teal & Logo Orange accents */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-5%] left-[10%] w-[500px] h-[500px] rounded-full bg-cyan-200/30 dark:bg-purple-600/15 blur-[100px]" />
+          <div className="absolute top-[20%] right-[10%] w-[450px] h-[450px] rounded-full bg-amber-200/25 dark:bg-amber-600/10 blur-[100px]" />
+          <div className="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] rounded-full bg-teal-200/20 dark:bg-emerald-600/5 blur-[110px]" />
+          <div className="absolute bottom-[-5%] right-[10%] w-[400px] h-[400px] rounded-full bg-amber-100/30 dark:bg-amber-700/10 blur-[100px]" />
+        </div>
 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="relative z-10 flex flex-col min-h-screen w-full">

@@ -69,11 +69,11 @@ export default function Footer() {
                 href="https://github.com/J4ndro/infoEdu"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 dark:bg-gray-850 dark:hover:bg-gray-800 text-white font-bold text-sm rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 border border-transparent dark:border-gray-800 group"
+                className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-full transition-all duration-300 shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/35 hover:-translate-y-0.5 border border-amber-400/30 group"
               >
                 <GithubIcon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
                 <span>Ver en GitHub</span>
-                <ExternalLink className="w-3.5 h-3.5 text-gray-400 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <ExternalLink className="w-3.5 h-3.5 text-white/80 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
             </div>
           </div>
