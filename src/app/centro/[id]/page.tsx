@@ -2,7 +2,7 @@ import { Center } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ChevronLeft, MapPin, Phone, Globe, Building, BookOpen, GraduationCap } from 'lucide-react';
+import { ChevronLeft, MapPin, Phone, Globe, Building, BookOpen, GraduationCap, ExternalLink } from 'lucide-react';
 import MapWrapper from '@/components/MapWrapper';
 import { getCenters } from '@/lib/api';
 
@@ -233,16 +233,19 @@ export default async function CentroPage({ params }: { params: Promise<{ id: str
                 </a>
               )}
 
-              {/* Console Web */}
+              {/* Web del Centro / Portal GVA */}
               {center.url && (
-                <a href={center.url} target="_blank" rel="noreferrer" className="glass-card p-4 sm:p-5 rounded-xl block sm:col-span-2 cursor-pointer">
+                <a href={center.url} target="_blank" rel="noreferrer" className="glass-card p-4 sm:p-5 rounded-xl block sm:col-span-2 cursor-pointer group hover:border-primary-500/50 transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 dark:border-indigo-500/10 rounded-lg shrink-0">
+                    <div className="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 dark:border-indigo-500/10 rounded-lg shrink-0 group-hover:scale-110 transition-transform">
                       <Globe className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h4 className="text-xs font-bold text-gray-450 dark:text-gray-500 uppercase tracking-wider mb-1">Ficha en Conselleria</h4>
-                      <p className="font-bold text-primary-600 dark:text-primary-400 truncate text-sm">Ver portal oficial</p>
+                      <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Web del Centro / Portal GVA</h4>
+                      <p className="font-bold text-primary-600 dark:text-primary-400 truncate text-sm flex items-center gap-1.5">
+                        <span>{center.url}</span>
+                        <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                      </p>
                     </div>
                   </div>
                 </a>
