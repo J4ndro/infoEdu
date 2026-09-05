@@ -90,7 +90,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.className} bg-gradient-to-br from-slate-50 via-sky-50/30 to-indigo-50/20 dark:from-[#060814] dark:to-[#060814] text-slate-900 dark:text-slate-100 flex flex-col min-h-screen transition-colors relative overflow-x-hidden`}>
+      <body className={`${inter.className} bg-gradient-to-br from-slate-50 via-sky-50 to-indigo-50 dark:from-[#060814] dark:via-[#060814] dark:to-[#060814] text-slate-900 dark:text-slate-100 flex flex-col min-h-screen transition-colors relative overflow-x-hidden`}>
         {/* Ambient background glow elements for Liquid Glass Effect with Teal & Logo Orange accents */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute top-[-5%] left-[10%] w-[500px] h-[500px] rounded-full bg-cyan-200/30 dark:bg-purple-600/15 blur-[100px]" />

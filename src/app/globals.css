@@ -22,14 +22,7 @@
   --foreground: #0f172a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #060814;
-    --foreground: #f8fafc;
-  }
-}
-
-:root[class~="dark"] {
+.dark {
   --background: #060814;
   --foreground: #f8fafc;
 }
