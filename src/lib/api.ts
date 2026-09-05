@@ -20,116 +20,125 @@ export const getCenters = cache(async (): Promise<Center[]> => {
 
   console.log("🌐 [FETCH SERVIDOR] Descargando y procesando nuevos datos de GVA");
 
-  // Fetch FP data
-  const fpResponse = await fetch(FP_URL, { next: { revalidate: 86400 } });
-  if (!fpResponse.ok) {
-    throw new Error(`Failed to fetch FP data: ${fpResponse.statusText}`);
+  try {
+    // Fetch FP data
+    const fpResponse = await fetch(FP_URL, { next: { revalidate: 86400 } });
+    if (!fpResponse.ok) {
+      throw new Error(`Failed to fetch FP data: ${fpResponse.statusText}`);
+    }
+    const fpText = await fpResponse.text();
+
+    const fpMap = new Map<string, Map<string, FPCycle>>(); // cod_centro -> Map of unique cycles
+
+    await new Promise<void>((resolve, reject) => {
+      Readable.from(fpText)
+        .pipe(csv({ separator: ';' }))
+        .on('data', (data) => {
+          const codCentro = data.COD_CENTRO;
+          if (!codCentro) return;
+
+          if (!fpMap.has(codCentro)) {
+            fpMap.set(codCentro, new Map());
+          }
+
+          const family = data.NOM_FAMILIA || 'OTRAS FAMILIAS';
+          let grade = data.NOM_GRADO || 'Desconocido';
+          const name = data.NOM_CICLO || 'Desconocido';
+
+          // Clean up grade names
+          if (grade.includes('MEDIO')) grade = 'Grado Medio';
+          else if (grade.includes('SUPERIOR')) grade = 'Grado Superior';
+          else if (grade.includes('BÁSICA')) grade = 'FP Básica';
+
+          // Fix name casing
+          const formatName = (str: string) => {
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+          };
+
+          const key = `${family}|${grade}|${name}`;
+          fpMap.get(codCentro)!.set(key, { 
+            family: formatName(family), 
+            grade, 
+            name: formatName(name) 
+          });
+        })
+        .on('end', resolve)
+        .on('error', reject);
+    });
+
+    // Fetch Centers data
+    const response = await fetch(CENTROS_URL, { next: { revalidate: 86400 } });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch centers data: ${response.statusText}`);
+    }
+    const text = await response.text();
+    const results: Center[] = [];
+
+    await new Promise<void>((resolve, reject) => {
+      Readable.from(text)
+        .pipe(csv({ separator: ';' }))
+        .on('data', (data) => {
+          // Basic filtering to ensure valid coordinates
+          if (!data.latitud || !data.longitud) return;
+
+          const lat = parseFloat(data.latitud.replace(',', '.'));
+          const lng = parseFloat(data.longitud.replace(',', '.'));
+
+          if (isNaN(lat) || isNaN(lng)) return;
+
+          // Infer levels based on denominacion_generica_es
+          const denominacionGenerica = (data.denominacion_generica_es || '').toUpperCase();
+          const niveles: string[] = [];
+          if (denominacionGenerica.includes('INFANTIL')) niveles.push('Infantil');
+          if (denominacionGenerica.includes('PRIMARIA')) niveles.push('Primaria');
+          if (denominacionGenerica.includes('SECUNDARIA')) niveles.push('ESO');
+          if (denominacionGenerica.includes('BACHILLERATO') || denominacionGenerica.includes('SECUNDARIA')) niveles.push('Bachillerato');
+
+          // Check actual FP cycles
+          const fpCyclesMap = fpMap.get(data.codigo);
+          const fpCycles = fpCyclesMap ? Array.from(fpCyclesMap.values()) : [];
+
+          if (fpCycles.length > 0 || denominacionGenerica.includes('FORMACIÓN PROFESIONAL') || denominacionGenerica.includes('FORMACION PROFESIONAL') || denominacionGenerica.includes('SECUNDARIA')) {
+            if (!niveles.includes('FP')) niveles.push('FP');
+          }
+
+          let tipo = 'Desconocido';
+          const regimen = data.regimen || '';
+          if (regimen.includes('PÚB') || regimen.includes('PUB')) tipo = 'Público';
+          else if (regimen.includes('CONC')) tipo = 'Concertado';
+          else if (regimen.includes('PRIV')) tipo = 'Privado';
+
+          results.push({
+            id: data.codigo,
+            name: data.denominacion_especifica || data.denominacion,
+            type: tipo,
+            address: `${data.tipo_via || ''} ${data.direccion || ''} ${data.numero || ''}`.trim(),
+            zipCode: data.codigo_postal,
+            municipality: data.localidad,
+            province: data.provincia,
+            phone: data.telefono,
+            lat: lat,
+            lng: lng,
+            levels: niveles,
+            url: data.url_es,
+            fpCycles: fpCycles
+          });
+        })
+        .on('end', resolve)
+        .on('error', reject);
+    });
+
+    cachedCenters = results;
+    lastFetchTime = Date.now();
+    console.log(`✅ [CACHE SERVIDOR] Guardados ${results.length} centros en caché de memoria`);
+
+    return results;
+  } catch (error) {
+    console.error("❌ [API ERROR] Fallo al descargar/procesar datos de la GVA:", error);
+    if (cachedCenters) {
+      console.log("⚠️ [FALLBACK CACHÉ] Retornando versión anterior de centros en memoria");
+      return cachedCenters;
+    }
+    return [];
   }
-  const fpText = await fpResponse.text();
-
-  const fpMap = new Map<string, Map<string, FPCycle>>(); // cod_centro -> Map of unique cycles
-
-  await new Promise<void>((resolve, reject) => {
-    Readable.from(fpText)
-      .pipe(csv({ separator: ';' }))
-      .on('data', (data) => {
-        const codCentro = data.COD_CENTRO;
-        if (!codCentro) return;
-
-        if (!fpMap.has(codCentro)) {
-          fpMap.set(codCentro, new Map());
-        }
-
-        const family = data.NOM_FAMILIA || 'OTRAS FAMILIAS';
-        let grade = data.NOM_GRADO || 'Desconocido';
-        const name = data.NOM_CICLO || 'Desconocido';
-
-        // Clean up grade names
-        if (grade.includes('MEDIO')) grade = 'Grado Medio';
-        else if (grade.includes('SUPERIOR')) grade = 'Grado Superior';
-        else if (grade.includes('BÁSICA')) grade = 'FP Básica';
-
-        // Fix name casing
-        const formatName = (str: string) => {
-          return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-        };
-
-        const key = `${family}|${grade}|${name}`;
-        fpMap.get(codCentro)!.set(key, { 
-          family: formatName(family), 
-          grade, 
-          name: formatName(name) 
-        });
-      })
-      .on('end', resolve)
-      .on('error', reject);
-  });
-
-  // Fetch Centers data
-  const response = await fetch(CENTROS_URL, { next: { revalidate: 86400 } });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch centers data: ${response.statusText}`);
-  }
-  const text = await response.text();
-  const results: Center[] = [];
-
-  await new Promise<void>((resolve, reject) => {
-    Readable.from(text)
-      .pipe(csv({ separator: ';' }))
-      .on('data', (data) => {
-        // Basic filtering to ensure valid coordinates
-        if (!data.latitud || !data.longitud) return;
-
-        const lat = parseFloat(data.latitud.replace(',', '.'));
-        const lng = parseFloat(data.longitud.replace(',', '.'));
-
-        if (isNaN(lat) || isNaN(lng)) return;
-
-        // Infer levels based on denominacion_generica_es
-        const denominacionGenerica = (data.denominacion_generica_es || '').toUpperCase();
-        const niveles: string[] = [];
-        if (denominacionGenerica.includes('INFANTIL')) niveles.push('Infantil');
-        if (denominacionGenerica.includes('PRIMARIA')) niveles.push('Primaria');
-        if (denominacionGenerica.includes('SECUNDARIA')) niveles.push('ESO');
-        if (denominacionGenerica.includes('BACHILLERATO') || denominacionGenerica.includes('SECUNDARIA')) niveles.push('Bachillerato');
-
-        // Check actual FP cycles
-        const fpCyclesMap = fpMap.get(data.codigo);
-        const fpCycles = fpCyclesMap ? Array.from(fpCyclesMap.values()) : [];
-
-        if (fpCycles.length > 0 || denominacionGenerica.includes('FORMACIÓN PROFESIONAL') || denominacionGenerica.includes('FORMACION PROFESIONAL') || denominacionGenerica.includes('SECUNDARIA')) {
-          if (!niveles.includes('FP')) niveles.push('FP');
-        }
-
-        let tipo = 'Desconocido';
-        const regimen = data.regimen || '';
-        if (regimen.includes('PÚB') || regimen.includes('PUB')) tipo = 'Público';
-        else if (regimen.includes('CONC')) tipo = 'Concertado';
-        else if (regimen.includes('PRIV')) tipo = 'Privado';
-
-        results.push({
-          id: data.codigo,
-          name: data.denominacion_especifica || data.denominacion,
-          type: tipo,
-          address: `${data.tipo_via || ''} ${data.direccion || ''} ${data.numero || ''}`.trim(),
-          zipCode: data.codigo_postal,
-          municipality: data.localidad,
-          province: data.provincia,
-          phone: data.telefono,
-          lat: lat,
-          lng: lng,
-          levels: niveles,
-          url: data.url_es,
-          fpCycles: fpCycles
-        });
-      })
-      .on('end', resolve)
-      .on('error', reject);
-  });
-
-  cachedCenters = results;
-  lastFetchTime = Date.now();
-  console.log(`✅ [CACHE SERVIDOR] Guardados ${results.length} centros en caché de memoria`);
-
-  return results;
 });

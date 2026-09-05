@@ -8,13 +8,23 @@ import { getCenters } from '@/lib/api';
 
 export const revalidate = 86400; // Revalidate every 24 hours
 
+export async function generateStaticParams() {
+  const centers = await getCenters();
+  return centers.map((center) => ({
+    id: center.id,
+  }));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const centers = await getCenters();
   const center = centers.find((c) => c.id === id);
 
   if (!center) {
-    return { title: 'Centro no encontrado' };
+    return {
+      title: 'Centro no encontrado | InfoEdu CV',
+      robots: { index: false, follow: false },
+    };
   }
 
   const nivelesStr = center.levels && center.levels.length > 0 ? `Oferta educativa: ${center.levels.join(', ')}.` : '';
