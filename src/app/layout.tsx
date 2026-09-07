@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -18,7 +20,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "InfoEdu CV | Mejores Colegios e Institutos de la Comunitat Valenciana",
+    default: "InfoEdu CV | Buscador de Colegios, Institutos y FP de la Comunitat Valenciana",
     template: "%s | Guía de Centros InfoEdu CV"
   },
   description: "Buscador oficial de colegios públicos, concertados y privados en Valencia, Alicante y Castellón. Encuentra toda la oferta de FP, Institutos y centros educativos de la GVA con mapa interactivo.",
@@ -40,6 +42,12 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://info-edu-cv.vercel.app'),
   alternates: {
     canonical: '/',
+    languages: {
+      'es': '/',
+      'ca-ES': '/?lang=va',
+      'en': '/?lang=en',
+      'x-default': '/',
+    },
   },
   robots: {
     index: true,
@@ -57,6 +65,7 @@ export const metadata: Metadata = {
     description: "Guía oficial y mapa de todos los colegios, institutos y centros de FP de la GVA. Elige el mejor futuro para tus hijos.",
     siteName: "InfoEdu CV",
     locale: "es_ES",
+    alternateLocale: ["ca_ES", "en_US"],
     type: "website",
     images: [
       {
@@ -100,13 +109,17 @@ export default function RootLayout({
         </div>
 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="relative z-10 flex flex-col min-h-screen w-full">
-            <Header />
-            <main className="flex-grow flex flex-col relative z-10">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <Suspense fallback={null}>
+            <LanguageProvider>
+              <div className="relative z-10 flex flex-col min-h-screen w-full">
+                <Header />
+                <main className="flex-grow flex flex-col relative z-10">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+            </LanguageProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

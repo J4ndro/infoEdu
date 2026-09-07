@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Heart, ExternalLink, Code, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg
@@ -22,6 +23,8 @@ const GithubIcon = ({ className }: { className?: string }) => (
 );
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   const scrollToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -40,7 +43,7 @@ export default function Footer() {
               href="/"
               onClick={scrollToTop}
               className="flex items-center gap-2 group w-fit"
-              aria-label="InfoEdu CV - Subir al inicio"
+              aria-label="InfoEdu CV"
             >
               <div className="p-2 rounded-xl bg-primary-500/10 dark:bg-primary-400/10 border border-primary-500/20 dark:border-primary-400/20 group-hover:scale-105 transition-transform duration-300">
                 <Sparkles className="w-5 h-5 text-primary-600 dark:text-primary-400 animate-pulse" />
@@ -51,7 +54,7 @@ export default function Footer() {
             </Link>
 
             <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed max-w-md">
-              Una plataforma independiente y de alto rendimiento diseñada para facilitar la búsqueda interactiva, visual e inteligente de colegios, institutos y ciclos formativos de Formación Profesional en la Comunitat Valenciana. Accede a datos oficiales de forma fluida y ágil.
+              {t.footer.description}
             </p>
           </div>
 
@@ -59,10 +62,10 @@ export default function Footer() {
           <div className="md:col-span-4 flex flex-col space-y-4">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-wider uppercase flex items-center gap-2">
               <Code className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-              Código Abierto (Open Source)
+              {t.footer.openSourceTitle}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              InfoEdu CV es un proyecto 100% de código abierto. Creemos firmemente en el software libre para mejorar el acceso a los servicios públicos de educación. Todo el desarrollo y los datos son transparentes.
+              {t.footer.openSourceDesc}
             </p>
             <div className="pt-2">
               <a
@@ -72,17 +75,16 @@ export default function Footer() {
                 className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-full transition-all duration-300 shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/35 hover:-translate-y-0.5 border border-amber-400/30 group"
               >
                 <GithubIcon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-                <span>Ver en GitHub</span>
+                <span>{t.footer.viewOnGithub}</span>
                 <ExternalLink className="w-3.5 h-3.5 text-white/80 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
             </div>
           </div>
 
-
           {/* Column 3: Quick Links & Attribution */}
           <div className="md:col-span-3 flex flex-col space-y-4">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-wider uppercase">
-              Enlaces Útiles
+              {t.footer.usefulLinks}
             </h3>
             <ul className="space-y-2.5 text-sm">
               <li>
@@ -91,7 +93,7 @@ export default function Footer() {
                   onClick={scrollToTop}
                   className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-200"
                 >
-                  Buscar Centros
+                  {t.footer.searchSchools}
                 </Link>
               </li>
               <li>
@@ -106,7 +108,7 @@ export default function Footer() {
                     }
                   }}
                 >
-                  Preguntas Frecuentes
+                  {t.footer.faq}
                 </a>
               </li>
               <li>
@@ -116,7 +118,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-200 group"
                 >
-                  <span>GVA Dades Obertes</span>
+                  <span>{t.footer.gvaOpenData}</span>
                   <ExternalLink className="w-3 h-3 text-gray-400 group-hover:translate-x-0.5" />
                 </a>
               </li>
@@ -130,9 +132,9 @@ export default function Footer() {
         {/* Footer Bottom: Copyright & Attribution */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-gray-500 dark:text-gray-500">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1">
-            <span>© {new Date().getFullYear()} InfoEdu CV. Creado con</span>
+            <span>© {new Date().getFullYear()} {t.footer.createdWith}</span>
             <Heart className="w-3.5 h-3.5 text-red-500 animate-heartbeat fill-red-500 inline-block mx-0.5" />
-            <span>por</span>
+            <span>{t.footer.by}</span>
             <a
               href="https://portfolio-alehinarejos.vercel.app/"
               target="_blank"
@@ -142,11 +144,11 @@ export default function Footer() {
               Alehinarejos
             </a>
             <span className="mx-1">•</span>
-            <span>Licencia MIT.</span>
+            <span>{t.footer.mitLicense}</span>
           </div>
 
           <div className="text-center sm:text-right max-w-md">
-            <span>Este portal no tiene vinculación oficial con la Generalitat Valenciana. Los datos expuestos provienen de portales de datos abiertos de la GVA.</span>
+            <span>{t.footer.disclaimer}</span>
           </div>
         </div>
       </div>

@@ -5,13 +5,14 @@ import { useMemo, useCallback, useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Center } from '@/types';
 import dynamic from 'next/dynamic';
-import { Search, Map as MapIcon, List as ListIcon, GraduationCap, Building, MapPin, ArrowRight, Navigation, Bookmark, Share2, X, Globe } from 'lucide-react';
+import { Search, Map as MapIcon, List as ListIcon, GraduationCap, Building, MapPin, ArrowRight, Navigation, Share2, X, Globe } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const MapWrapper = dynamic(() => import('./MapWrapper'), {
   ssr: false,
   loading: () => (
     <div className="h-full w-full bg-gray-100 dark:bg-gray-900 animate-pulse rounded-lg flex items-center justify-center">
-      <span className="text-gray-400 font-bold">Cargando mapa...</span>
+      <span className="text-gray-400 font-bold">...</span>
     </div>
   )
 });
@@ -37,6 +38,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 export default function Directory({ initialCenters }: DirectoryProps) {
+  const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -83,7 +85,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [searchParams, pathname, router]);
 
-  // Efectos de debounce para actualizar la URL solo tras 250ms de inactividad al teclear
+  // Debounce effects to update URL without lag
   useEffect(() => {
     const handler = setTimeout(() => {
       if (localQuery !== query) {
@@ -111,7 +113,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
     return () => clearTimeout(handler);
   }, [localCycleQuery, cycleQuery, setParam]);
 
-  // Sincronizar estados locales cuando cambian los valores de la URL externamente (ej: al limpiar filtros)
+  // Synchronize local states when URL changes externally
   useEffect(() => {
     setLocalQuery(query);
   }, [query]);
@@ -135,7 +137,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
     params.delete('family');
     params.delete('cycleQ');
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    setUserLocation(null); // Also clear location
+    setUserLocation(null);
   }, [searchParams, pathname, router]);
 
   const activeFiltersCount = useMemo(() => {
@@ -145,7 +147,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
     if (selectedProvince) count++;
     if (selectedLevel) count++;
     if (selectedTitularidad) count++;
-    if (userLocation) count++; // Consider location a filter
+    if (userLocation) count++;
     if (selectedLevel === 'FP') {
       if (cycleQuery) count++;
       if (selectedFamily) count++;
@@ -167,21 +169,21 @@ export default function Directory({ initialCenters }: DirectoryProps) {
   const handleShare = async () => {
     const url = window.location.href;
     const shareData = {
-      title: 'InfoEduCV',
-      text: 'Mira esta búsqueda de centros educativos en InfoEduCV',
+      title: 'InfoEdu CV',
+      text: t.search.shareText,
       url: url
     };
 
     if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
       try {
         await navigator.share(shareData);
-      } catch (err) {
-        console.log('Share canceled or failed', err);
+      } catch {
+        // Share cancelled
       }
     } else {
       try {
         await navigator.clipboard.writeText(url);
-        alert('¡Enlace de tu búsqueda copiado al portapapeles!');
+        alert(t.search.linkCopied);
       } catch (err) {
         console.error('Failed to copy', err);
       }
@@ -191,11 +193,10 @@ export default function Directory({ initialCenters }: DirectoryProps) {
   // Handle Location Click
   const handleLocationClick = () => {
     if (!navigator.geolocation) {
-      alert("Tu navegador no soporta geolocalización.");
+      alert(t.search.geoNotSupported);
       return;
     }
 
-    // If already located, click to clear
     if (userLocation) {
       setUserLocation(null);
       return;
@@ -208,7 +209,6 @@ export default function Directory({ initialCenters }: DirectoryProps) {
         const lng = position.coords.longitude;
         setUserLocation([lat, lng]);
         
-        // Find closest center to determine province
         let closestCenter = initialCenters[0];
         let minDistance = Infinity;
         
@@ -220,13 +220,12 @@ export default function Directory({ initialCenters }: DirectoryProps) {
           }
         }
         
-        // Automatically set province to the closest center's province
         setParam('prov', closestCenter.province);
         setIsLocating(false);
       },
       (error) => {
         console.error(error);
-        alert("Error al obtener la ubicación. Por favor, asegúrate de haber dado permiso de ubicación a la página web.");
+        alert(t.search.geoError);
         setIsLocating(false);
       },
       { timeout: 10000 }
@@ -254,7 +253,6 @@ export default function Directory({ initialCenters }: DirectoryProps) {
         const hasCycles = center.fpCycles && center.fpCycles.length > 0;
         
         if (!hasCycles && (selectedFpGrade || selectedFamily || cycleQuery)) {
-          // If user applied FP subfilters but center has no cycle details, it shouldn't match
           matchesFp = false;
         } else if (hasCycles) {
           matchesFp = center.fpCycles!.some(cycle => {
@@ -270,14 +268,13 @@ export default function Directory({ initialCenters }: DirectoryProps) {
     });
 
     if (userLocation) {
-      // Calculate distance and sort
       results = results.map(center => ({
         ...center,
         distance: calculateDistance(userLocation[0], userLocation[1], center.lat, center.lng)
       })).sort((a, b) => (a.distance || 0) - (b.distance || 0));
     }
 
-    return results.slice(0, 100); // Limit to 100 for performance in list/map
+    return results.slice(0, 100);
   }, [initialCenters, query, zipCode, selectedProvince, selectedLevel, selectedTitularidad, cycleQuery, selectedFamily, selectedFpGrade, userLocation]);
 
   const customSelectStyles = {
@@ -287,21 +284,39 @@ export default function Directory({ initialCenters }: DirectoryProps) {
     backgroundSize: '1.5em 1.5em'
   };
 
+  const getLocalizedType = (type: string) => {
+    const upper = type?.toUpperCase();
+    if (upper === 'PÚBLICO') return t.filters.public;
+    if (upper === 'PRIVADO') return t.filters.private;
+    if (upper === 'CONCERTADO') return t.filters.concerted;
+    return type;
+  };
+
+  const getLocalizedLevel = (lvl: string) => {
+    if (lvl === 'FP') return t.levels.fpShort;
+    if (lvl === 'Infantil') return t.levels.infantil;
+    if (lvl === 'Primaria') return t.levels.primaria;
+    if (lvl === 'ESO') return t.levels.eso;
+    if (lvl === 'Bachillerato') return t.levels.bachillerato;
+    return lvl;
+  };
+
   return (
     <div className={`flex flex-col ${viewMode === 'map' ? 'h-[calc(100vh-80px)]' : 'min-h-[calc(100vh-80px)]'}`}>
       {viewMode === 'list' && (
         <div className="text-center pt-12 pb-8 px-4 shrink-0 max-w-4xl mx-auto animate-fade-in-up">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4 leading-tight">
-            Busca tu centro educativo en la <br className="hidden sm:inline" />
+            {t.hero.title1} <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#e59829] dark:from-primary-400 dark:via-amber-400 dark:to-amber-300">
-              Comunitat Valenciana
+              {t.hero.title2}
             </span>
           </h2>
           <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
-            Encuentra colegios, institutos y todos los ciclos formativos de FP de la GVA en nuestro mapa interactivo y listado inteligente.
+            {t.hero.subtitle}
           </p>
         </div>
       )}
+      
       {/* Search and Filters Bar */}
       <div className="p-4 shrink-0 transition-colors z-10 relative bg-transparent">
         <div className="max-w-7xl mx-auto">
@@ -313,7 +328,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Buscar centro..."
+                  placeholder={t.search.centerPlaceholder}
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white placeholder:text-slate-400 shadow-xs"
                   value={localQuery}
                   onChange={(e) => setLocalQuery(e.target.value)}
@@ -323,7 +338,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               <div className="relative w-full sm:w-36">
                 <input
                   type="text"
-                  placeholder="Código postal"
+                  placeholder={t.search.zipPlaceholder}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white placeholder:text-slate-400 shadow-xs"
                   value={localZipCode}
                   onChange={(e) => setLocalZipCode(e.target.value)}
@@ -341,13 +356,14 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 }`}
               >
                 <Navigation className={`w-4 h-4 ${isLocating ? 'animate-pulse' : ''}`} /> 
-                {isLocating ? 'Localizando...' : userLocation ? 'Ubicación activa' : 'Mi ubicación'}
+                {isLocating ? t.search.locating : userLocation ? t.search.locationActive : t.search.myLocation}
               </button>
               
               <button 
                 onClick={handleShare}
                 className="hidden sm:flex items-center justify-center w-12 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-all shadow-xs hover:-translate-y-0.5 cursor-pointer"
-                title="Compartir esta búsqueda"
+                title={t.search.shareTitle}
+                aria-label={t.search.shareTitle}
               >
                 <Share2 className="w-4 h-4" />
               </button>
@@ -356,16 +372,16 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 <button
                   onClick={() => setParam('view', 'list')}
                   className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'list' ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs border border-amber-400/30' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
-                  aria-label="Ver en modo lista"
-                  title="Vista de lista"
+                  aria-label={t.search.listView}
+                  title={t.search.listView}
                 >
                   <ListIcon className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setParam('view', 'map')}
                   className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'map' ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs border border-amber-400/30' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
-                  aria-label="Ver en modo mapa"
-                  title="Vista de mapa"
+                  aria-label={t.search.mapView}
+                  title={t.search.mapView}
                 >
                   <MapIcon className="h-4 w-4" />
                 </button>
@@ -375,7 +391,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
             {/* Quick Public / Private Toggle Pills */}
             <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-200/40 dark:border-white/5 flex-wrap">
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mr-1">
-                Centro:
+                {t.filters.centerType}
               </span>
               <button
                 type="button"
@@ -386,7 +402,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     : 'bg-white/60 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/10'
                 }`}
               >
-                Todos
+                {t.filters.all}
               </button>
               <button
                 type="button"
@@ -398,7 +414,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-primary-400 inline-block"></span>
-                Público
+                {t.filters.public}
               </button>
               <button
                 type="button"
@@ -410,7 +426,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
-                Privado
+                {t.filters.private}
               </button>
               <button
                 type="button"
@@ -422,7 +438,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-purple-400 inline-block"></span>
-                Concertado
+                {t.filters.concerted}
               </button>
               <button
                 type="button"
@@ -433,57 +449,63 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     : 'bg-white/60 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/10'
                 }`}
               >
-                Privado y Concertado
+                {t.filters.privateAndConcerted}
               </button>
             </div>
 
             {/* Row 2: Categories */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Provincia</label>
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">
+                  {t.filters.province}
+                </label>
                 <select 
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
                   value={selectedProvince}
                   onChange={(e) => setParam('prov', e.target.value)}
                 >
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todas las provincias</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="ALICANTE/ALACANT">Alicante</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="CASTELLÓN/CASTELLÓ">Castellón</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="VALENCIA/VALÈNCIA">Valencia</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">{t.filters.allProvinces}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="ALICANTE/ALACANT">{t.provinces.alicante}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="CASTELLÓN/CASTELLÓ">{t.provinces.castellon}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="VALENCIA/VALÈNCIA">{t.provinces.valencia}</option>
                 </select>
               </div>
               
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Nivel Educativo</label>
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">
+                  {t.filters.educationLevel}
+                </label>
                 <select 
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
                   value={selectedLevel}
                   onChange={(e) => setParam('level', e.target.value)}
                 >
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todos los niveles</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Infantil">Infantil</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Primaria">Primaria</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="ESO">ESO</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Bachillerato">Bachillerato</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="FP">Formación Profesional</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">{t.filters.allLevels}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Infantil">{t.levels.infantil}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Primaria">{t.levels.primaria}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="ESO">{t.levels.eso}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Bachillerato">{t.levels.bachillerato}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="FP">{t.levels.fp}</option>
                 </select>
               </div>
               
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Centro Público / Privado</label>
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">
+                  {t.filters.schoolType}
+                </label>
                 <select 
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
                   value={selectedTitularidad}
                   onChange={(e) => setParam('tit', e.target.value)}
                 >
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Público y Privado (Todos)</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Público">Público</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Privado">Privado</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Concertado">Concertado</option>
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="privado_todos">Privado y Concertado</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">{t.filters.allSchoolTypes}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Público">{t.filters.public}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Privado">{t.filters.private}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Concertado">{t.filters.concerted}</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="privado_todos">{t.filters.privateAndConcerted}</option>
                 </select>
               </div>
             </div>
@@ -493,12 +515,14 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               <div className="mt-5 pt-5 border-t border-slate-200/30 dark:border-white/5 animate-fade-in-up">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
-                    <label className="block text-[11px] font-bold text-amber-600 dark:text-amber-500 tracking-wider uppercase mb-1.5">Nombre del ciclo</label>
+                    <label className="block text-[11px] font-bold text-amber-600 dark:text-amber-500 tracking-wider uppercase mb-1.5">
+                      {t.filters.fpCycleName}
+                    </label>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500 dark:text-amber-500" />
                       <input 
                         type="text" 
-                        placeholder="Ej: Desarrollo Web" 
+                        placeholder={t.filters.fpCyclePlaceholder}
                         className="w-full pl-9 pr-4 py-3 rounded-xl border border-amber-500/30 dark:border-amber-500/10 bg-amber-500/5 dark:bg-amber-950/15 focus:bg-white dark:focus:bg-gray-950 text-sm outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-semibold text-gray-900 dark:text-white placeholder:text-amber-500/70" 
                         value={localCycleQuery} 
                         onChange={(e) => setLocalCycleQuery(e.target.value)} 
@@ -506,31 +530,35 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-amber-600 dark:text-amber-500 tracking-wider uppercase mb-1.5">Familia</label>
+                    <label className="block text-[11px] font-bold text-amber-600 dark:text-amber-500 tracking-wider uppercase mb-1.5">
+                      {t.filters.fpFamily}
+                    </label>
                     <select 
                       className="w-full px-4 py-3 rounded-xl border border-amber-500/40 bg-amber-500/5 dark:bg-amber-950/15 text-sm outline-none focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-amber-900 dark:text-amber-300 appearance-none cursor-pointer"
                       style={{ backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%23f59e0b\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")', backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                       value={selectedFamily}
                       onChange={(e) => setParam('family', e.target.value)}
                     >
-                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todas</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">{t.filters.allFamilies}</option>
                       {allFamilies.map(family => (
                         <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" key={family} value={family}>{family}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-amber-600 dark:text-amber-500 tracking-wider uppercase mb-1.5">Nivel</label>
+                    <label className="block text-[11px] font-bold text-amber-600 dark:text-amber-500 tracking-wider uppercase mb-1.5">
+                      {t.filters.fpGrade}
+                    </label>
                     <select 
                       className="w-full px-4 py-3 rounded-xl border border-amber-500/30 dark:border-amber-500/10 bg-amber-500/5 dark:bg-amber-950/15 text-sm outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer"
                       style={{ backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%23fbbf24\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")', backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                       value={selectedFpGrade}
                       onChange={(e) => setParam('fp', e.target.value)}
                     >
-                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todos</option>
-                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="FP Básica">FP Básica</option>
-                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Grado Medio">Grado Medio</option>
-                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Grado Superior">Grado Superior</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">{t.filters.allGrades}</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="FP Básica">{t.fpGrades.basica}</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Grado Medio">{t.fpGrades.medio}</option>
+                      <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Grado Superior">{t.fpGrades.superior}</option>
                     </select>
                   </div>
                 </div>
@@ -544,7 +572,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                   onClick={clearAllFilters}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-rose-200/50 dark:border-rose-900/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-400 text-xs font-bold transition-all cursor-pointer hover:shadow-sm"
                 >
-                  Eliminar {activeFiltersCount} {activeFiltersCount === 1 ? 'filtro' : 'filtros'} <X className="w-3.5 h-3.5" />
+                  {t.filters.clearFilters} {activeFiltersCount} {activeFiltersCount === 1 ? t.filters.clearFilterSingular : t.filters.clearFilterPlural} <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
@@ -567,12 +595,12 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                          <div className="flex items-center gap-1.5 flex-wrap">
                            <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase border border-slate-200/50 dark:border-white/10 bg-white/40 dark:bg-white/5 text-gray-700 dark:text-gray-300 flex items-center gap-1">
                              <Building className="w-3 h-3" />
-                             {center.type}
+                             {getLocalizedType(center.type)}
                            </span>
                            {center.hasCustomUrl && (
                              <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 uppercase tracking-wider flex items-center gap-1 shadow-2xs">
                                <Globe className="w-2.5 h-2.5" />
-                               Web Propia
+                               {t.cards.ownWebsite}
                              </span>
                            )}
                          </div>
@@ -595,7 +623,9 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                             <MapPin className="w-4 h-4 text-white" />
                           </div>
                           <p className="text-[15px] font-medium leading-relaxed line-clamp-2">
-                            <span className="font-bold text-amber-700 dark:text-amber-400 block text-xs uppercase tracking-wider mb-0.5 opacity-80">Ubicación</span>
+                            <span className="font-bold text-amber-700 dark:text-amber-400 block text-xs uppercase tracking-wider mb-0.5 opacity-80">
+                              {t.cards.location}
+                            </span>
                             {center.municipality} <span className="text-gray-400 dark:text-gray-500 font-normal">({center.province.split('/')[0]})</span>
                           </p>
                         </div>
@@ -605,7 +635,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                         <div className="flex flex-wrap gap-2">
                           {center.levels.map(lvl => (
                             <span key={lvl} className="px-2.5 py-1 bg-amber-500/10 text-amber-800 dark:text-amber-300 text-xs font-bold rounded-md border border-amber-500/20 dark:border-amber-500/10 shadow-xs">
-                              {lvl === 'FP' ? 'Form. Profesional' : lvl}
+                              {getLocalizedLevel(lvl)}
                             </span>
                           ))}
                         </div>
@@ -614,7 +644,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     
                     <div className="p-4 bg-slate-550/10 dark:bg-white/5 border-t border-slate-200/30 dark:border-white/5 mt-auto flex gap-2">
                       <Link href={`/centro/${center.id}`} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
-                        Explorar centro
+                        {t.cards.exploreCenter}
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </Link>
                       {center.url && (
@@ -622,7 +652,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                           href={center.url}
                           target="_blank"
                           rel="noreferrer"
-                          title={center.hasCustomUrl ? 'Abrir web oficial del centro' : 'Abrir web / ficha oficial'}
+                          title={center.hasCustomUrl ? t.cards.openWebsite : t.cards.openOfficialWeb}
                           className="flex items-center justify-center px-3.5 rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-xs hover:-translate-y-0.5 cursor-pointer"
                         >
                           <Globe className="w-4 h-4" />
@@ -636,8 +666,8 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     <div className="w-20 h-20 bg-slate-200/50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-300/30 dark:border-white/10">
                       <GraduationCap className="h-10 w-10 text-gray-400 dark:text-gray-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No se encontraron centros</h3>
-                    <p>Prueba a cambiar los filtros de búsqueda.</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t.cards.noCentersFound}</h3>
+                    <p>{t.cards.tryChangingFilters}</p>
                   </div>
                 )}
               </div>

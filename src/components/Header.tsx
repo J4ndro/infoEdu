@@ -1,9 +1,15 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { Map, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import LanguageSelector from './LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Header() {
+  const { t } = useLanguage();
+
   return (
     <header className="glass-panel sticky top-0 z-50 border-b border-gray-200/30 dark:border-white/5 transition-all">
       {/* Decorative top gradient matching logo colors (Teal to Orange) */}
@@ -19,13 +25,14 @@ export default function Header() {
               InfoEdu <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#e59829] dark:from-primary-400 dark:to-amber-400">Comunitat Valenciana</span>
             </span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <div className="hidden md:flex space-x-4 items-center">
               <Link href="/" className="group flex items-center gap-2 px-5 py-2 rounded-full text-white font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-md hover:shadow-amber-500/30 hover:-translate-y-0.5 transition-all duration-300 border border-amber-400/30">
                 <Search className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
-                Buscar Centros
+                {t.nav.searchSchools}
               </Link>
             </div>
+            <LanguageSelector />
             <ThemeToggle />
           </div>
         </nav>

@@ -2,33 +2,17 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
-
-const faqs = [
-  {
-    question: "¿Cómo puedo encontrar un colegio específico en la Comunitat Valenciana?",
-    answer: "Puedes usar nuestro buscador avanzado en la parte superior. Solo tienes que escribir el nombre del centro, el municipio o incluso el código postal. También puedes filtrar por provincia (Valencia, Alicante o Castellón) para acotar los resultados."
-  },
-  {
-    question: "¿Qué tipos de centros educativos aparecen en InfoEdu CV?",
-    answer: "En nuestra plataforma encontrarás todos los centros registrados en la Generalitat Valenciana (GVA), incluyendo colegios públicos, concertados y privados, así como institutos de secundaria y centros integrados de Formación Profesional (CIPFP)."
-  },
-  {
-    question: "¿Está actualizada la información de los ciclos de FP?",
-    answer: "Sí, utilizamos datos abiertos de la GVA que incluyen la oferta completa de ciclos de Grado Básico, Medio y Superior. Puedes buscar por familia profesional o por el nombre del ciclo específico para ver qué centros lo imparten este curso."
-  },
-  {
-    question: "¿Cómo puedo ver la ubicación exacta de un centro?",
-    answer: "Cada centro tiene una ficha detallada con su dirección y un mapa interactivo. Además, desde el buscador principal puedes cambiar a la 'Vista de Mapa' para ver todos los centros geolocalizados en tu zona."
-  }
-];
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function FAQ() {
+  const { t, language } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": faqs.map(faq => ({
+    "inLanguage": language === 'va' ? 'ca' : language,
+    "mainEntity": t.faq.items.map(faq => ({
       "@type": "Question",
       "name": faq.question,
       "acceptedAnswer": {
@@ -48,15 +32,15 @@ export default function FAQ() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 text-primary-700 dark:text-primary-300 text-xs font-bold uppercase tracking-wider mb-4 border border-primary-500/20 dark:border-primary-500/10 shadow-sm">
             <HelpCircle className="w-4 h-4" />
-            Preguntas Frecuentes
+            {t.faq.badge}
           </div>
           <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-            Todo lo que necesitas saber sobre <span className="text-primary-700 dark:text-primary-500">InfoEdu CV</span>
+            {t.faq.titlePre} <span className="text-primary-700 dark:text-primary-500">{t.faq.titleHighlight}</span>
           </h2>
         </div>
 
         <div className="space-y-4">
-          {faqs.map((faq, index) => (
+          {t.faq.items.map((faq, index) => (
             <div 
               key={index}
               className="glass-card group rounded-2xl overflow-hidden cursor-pointer"
