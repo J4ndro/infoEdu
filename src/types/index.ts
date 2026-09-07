@@ -17,6 +17,8 @@ export interface Center {
   lng: number;
   levels: string[];
   url?: string;
+  gvaUrl?: string;
+  hasCustomUrl?: boolean;
   fpCycles?: FPCycle[];
   distance?: number;
 }

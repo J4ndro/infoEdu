@@ -235,22 +235,40 @@ export default async function CentroPage({ params }: { params: Promise<{ id: str
 
               {/* Web del Centro / Portal GVA */}
               {center.url && (
-                <a href={center.url} target="_blank" rel="noreferrer" className="glass-card p-4 sm:p-5 rounded-xl block sm:col-span-2 cursor-pointer group hover:border-primary-500/50 transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 dark:border-indigo-500/10 rounded-lg shrink-0 group-hover:scale-110 transition-transform">
-                      <Globe className="w-5 h-5" />
+                <div className="sm:col-span-2 space-y-2">
+                  <a href={center.url} target="_blank" rel="noreferrer" className="glass-card p-4 sm:p-5 rounded-xl block cursor-pointer group hover:border-primary-500/50 transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 dark:border-indigo-500/10 rounded-lg shrink-0 group-hover:scale-110 transition-transform">
+                        <Globe className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {center.hasCustomUrl ? 'Sitio Web Oficial del Centro' : center.type === 'Público' ? 'Web del Centro (Portal GVA)' : 'Ficha Oficial del Centro (GVA)'}
+                          </h4>
+                          {center.hasCustomUrl && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 uppercase tracking-wider">
+                              Web Propia
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-bold text-primary-600 dark:text-primary-400 truncate text-sm flex items-center gap-1.5">
+                          <span>{center.url}</span>
+                          <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                        {center.type === 'Público' ? 'Web del Centro (Portal GVA)' : 'Ficha Oficial del Centro (GVA)'}
-                      </h4>
-                      <p className="font-bold text-primary-600 dark:text-primary-400 truncate text-sm flex items-center gap-1.5">
-                        <span>{center.url}</span>
-                        <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                      </p>
+                  </a>
+
+                  {center.hasCustomUrl && center.gvaUrl && center.gvaUrl !== center.url && (
+                    <div className="flex justify-end pr-1">
+                      <a href={center.gvaUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 font-semibold transition-colors cursor-pointer">
+                        <span>Ver también Ficha Oficial en Conselleria (GVA)</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
                     </div>
-                  </div>
-                </a>
+                  )}
+                </div>
               )}
             </div>
 

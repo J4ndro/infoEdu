@@ -2,6 +2,9 @@ import csv from 'csv-parser';
 import { Readable } from 'stream';
 import { Center, FPCycle } from '@/types';
 import { cache } from 'react';
+import privateWebsites from '@/data/privateWebsites.json';
+
+const privateWebsitesMap = privateWebsites as Record<string, string>;
 
 const CENTROS_URL = 'https://dadesobertes.gva.es/dataset/68eb1d94-76d3-4305-8507-e1aab7717d0e/resource/1aa53c3a-4639-41aa-ac85-d58254c428c0/download/centros-docentes-de-la-comunitat-valenciana.csv';
 const FP_URL = 'https://dadesobertes.gva.es/dataset/a2183efe-f62c-48ec-bdbe-22a4b63c3832/resource/79af67de-71a2-48b1-bd6d-57a2996e2669/download/alumnos-matriculados-fp_2025.csv';
@@ -108,6 +111,12 @@ export const getCenters = cache(async (): Promise<Center[]> => {
           else if (regimen.includes('CONC')) tipo = 'Concertado';
           else if (regimen.includes('PRIV')) tipo = 'Privado';
 
+          const customWebsite = privateWebsitesMap[data.codigo];
+          const defaultGvaUrl = tipo === 'Público' ? `https://portal.edu.gva.es/${data.codigo}/` : data.url_es;
+          const finalUrl = customWebsite || defaultGvaUrl;
+          const gvaUrl = data.url_es || (tipo === 'Público' ? `https://portal.edu.gva.es/${data.codigo}/` : undefined);
+          const hasCustomUrl = Boolean(customWebsite);
+
           results.push({
             id: data.codigo,
             name: data.denominacion_especifica || data.denominacion,
@@ -120,7 +129,9 @@ export const getCenters = cache(async (): Promise<Center[]> => {
             lat: lat,
             lng: lng,
             levels: niveles,
-            url: tipo === 'Público' ? `https://portal.edu.gva.es/${data.codigo}/` : data.url_es,
+            url: finalUrl,
+            gvaUrl: gvaUrl,
+            hasCustomUrl: hasCustomUrl,
             fpCycles: fpCycles
           });
         })
