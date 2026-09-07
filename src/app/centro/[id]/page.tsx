@@ -241,7 +241,9 @@ export default async function CentroPage({ params }: { params: Promise<{ id: str
                       <Globe className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Web del Centro / Portal GVA</h4>
+                      <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                        {center.type === 'Público' ? 'Web del Centro (Portal GVA)' : 'Ficha Oficial del Centro (GVA)'}
+                      </h4>
                       <p className="font-bold text-primary-600 dark:text-primary-400 truncate text-sm flex items-center gap-1.5">
                         <span>{center.url}</span>
                         <ExternalLink className="w-3.5 h-3.5 shrink-0" />

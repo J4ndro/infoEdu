@@ -120,7 +120,7 @@ export const getCenters = cache(async (): Promise<Center[]> => {
             lat: lat,
             lng: lng,
             levels: niveles,
-            url: data.codigo ? `https://portal.edu.gva.es/${data.codigo}/` : data.url_es,
+            url: tipo === 'Público' ? `https://portal.edu.gva.es/${data.codigo}/` : data.url_es,
             fpCycles: fpCycles
           });
         })
