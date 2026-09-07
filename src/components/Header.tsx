@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search } from 'lucide-react';
@@ -9,9 +10,28 @@ import { useLanguage } from '@/context/LanguageContext';
 
 export default function Header() {
   const { t } = useLanguage();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 15);
+    };
+
+    // Check initial position on mount
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="glass-panel sticky top-0 z-50 border-b border-gray-200/30 dark:border-white/5 transition-all">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'header-glass-scrolled'
+          : 'header-glass-top'
+      }`}
+    >
       {/* Decorative top gradient matching logo colors (Teal to Orange) */}
       <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#f59e0b]"></div>
 

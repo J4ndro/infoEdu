@@ -4,6 +4,15 @@ export interface FPCycle {
   name: string;
 }
 
+export interface SocialMediaLinks {
+  instagram?: string;
+  facebook?: string;
+  twitter?: string;
+  linkedin?: string;
+  youtube?: string;
+  tiktok?: string;
+}
+
 export interface Center {
   id: string;
   name: string;
@@ -19,6 +28,7 @@ export interface Center {
   url?: string;
   gvaUrl?: string;
   hasCustomUrl?: boolean;
+  socialMedia?: SocialMediaLinks;
   fpCycles?: FPCycle[];
   distance?: number;
 }

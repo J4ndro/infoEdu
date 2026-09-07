@@ -1,13 +1,26 @@
 import csv from 'csv-parser';
 import { Readable } from 'stream';
-import { Center, FPCycle } from '@/types';
+import { Center, FPCycle, SocialMediaLinks } from '@/types';
 import { cache } from 'react';
 import privateWebsites from '@/data/privateWebsites.json';
+import socialMedia from '@/data/socialMedia.json';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
 const privateWebsitesMap = privateWebsites as Record<string, string>;
+const socialMediaMap = socialMedia as Record<string, SocialMediaLinks>;
+
+function enrichCenterWithCustomData(center: Center): Center {
+  const customWebsite = privateWebsitesMap[center.id];
+  const customSocial = socialMediaMap[center.id];
+  return {
+    ...center,
+    url: customWebsite || center.url,
+    hasCustomUrl: Boolean(customWebsite) || center.hasCustomUrl,
+    socialMedia: customSocial || center.socialMedia,
+  };
+}
 
 const CENTROS_URL = 'https://dadesobertes.gva.es/dataset/68eb1d94-76d3-4305-8507-e1aab7717d0e/resource/1aa53c3a-4639-41aa-ac85-d58254c428c0/download/centros-docentes-de-la-comunitat-valenciana.csv';
 const FP_URL = 'https://dadesobertes.gva.es/dataset/a2183efe-f62c-48ec-bdbe-22a4b63c3832/resource/79af67de-71a2-48b1-bd6d-57a2996e2669/download/alumnos-matriculados-fp_2025.csv';
@@ -23,7 +36,7 @@ export const getCenters = cache(async (): Promise<Center[]> => {
   const now = Date.now();
   if (cachedCenters && (now - lastFetchTime < CACHE_TTL)) {
     console.log("⚡ [CACHE SERVIDOR] Retornando centros educativos desde memoria caché");
-    return cachedCenters;
+    return cachedCenters.map(enrichCenterWithCustomData);
   }
 
   // Verificar caché persistente en disco (permite compartir datos entre workers de build)
@@ -35,7 +48,7 @@ export const getCenters = cache(async (): Promise<Center[]> => {
         cachedCenters = JSON.parse(fileData);
         lastFetchTime = stats.mtimeMs;
         console.log("⚡ [CACHE DISCO] Retornando centros educativos desde caché en disco");
-        return cachedCenters as Center[];
+        return (cachedCenters as Center[]).map(enrichCenterWithCustomData);
       }
     }
   } catch (e) {
@@ -173,7 +186,7 @@ export const getCenters = cache(async (): Promise<Center[]> => {
 
     console.log(`✅ [CACHE SERVIDOR] Guardados ${results.length} centros en caché de memoria`);
 
-    return results;
+    return results.map(enrichCenterWithCustomData);
   } catch (error) {
     console.error("❌ [API ERROR] Fallo al descargar/procesar datos de la GVA:", error);
     // Intentar fallback en disco si la descarga falló
@@ -182,14 +195,14 @@ export const getCenters = cache(async (): Promise<Center[]> => {
         const fileData = fs.readFileSync(DISK_CACHE_PATH, 'utf-8');
         cachedCenters = JSON.parse(fileData);
         console.log("⚠️ [FALLBACK DISCO] Retornando centros desde caché persistente en disco");
-        return cachedCenters as Center[];
+        return (cachedCenters as Center[]).map(enrichCenterWithCustomData);
       }
     } catch {
       // ignore
     }
     if (cachedCenters) {
       console.log("⚠️ [FALLBACK CACHÉ] Retornando versión anterior de centros en memoria");
-      return cachedCenters;
+      return cachedCenters.map(enrichCenterWithCustomData);
     }
     return [];
   }

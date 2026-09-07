@@ -104,6 +104,29 @@ export interface Translations {
     relatedSchoolsTitle: string;
     viewCenter: string;
     officialSourceNote: string;
+    reviewsTitle: string;
+    reviewsSubtitle: string;
+    reviewsBadge: string;
+    reviewsGoogleMaps: string;
+    reviewsGoogleMapsDesc: string;
+    reviewsSearchExperiences: string;
+    reviewsSearchExperiencesDesc: string;
+    reviewsOfficialGva: string;
+    reviewsOfficialGvaDesc: string;
+    reviewsSourceLabel: string;
+    reviewsSourceForums: string;
+    reviewsOpenReviews: string;
+    reviewsSearchThreads: string;
+    reviewsViewOfficial: string;
+    reviewsDisclaimer: string;
+    viewAllInMunicipality: string;
+    socialMediaTitle: string;
+    socialMediaSubtitle: string;
+    socialMediaBadge: string;
+    noSocialMediaTitle: string;
+    noSocialMediaDesc: string;
+    searchOnSocial: string;
+    visitProfile: string;
   };
   faq: {
     badge: string;
@@ -234,7 +257,30 @@ export const translations: Record<Language, Translations> = {
       breadcrumbsHome: "Inicio",
       relatedSchoolsTitle: "Otros centros educativos en",
       viewCenter: "Ver centro",
-      officialSourceNote: "Datos oficiales de la Generalitat Valenciana (GVA) y Conselleria d'Educació."
+      officialSourceNote: "Datos oficiales de la Generalitat Valenciana (GVA) y Conselleria d'Educació.",
+      reviewsTitle: "Opiniones y Reputación del Centro",
+      reviewsSubtitle: "Consulta valoraciones públicas, experiencias y puntuaciones reales de familias y alumnos.",
+      reviewsBadge: "Reputación y Experiencias",
+      reviewsGoogleMaps: "Ver opiniones en Google Maps",
+      reviewsGoogleMapsDesc: "Puntuación de estrellas y reseñas de la comunidad en Google Business.",
+      reviewsSearchExperiences: "Buscar experiencias en la red",
+      reviewsSearchExperiencesDesc: "Foros educativos, testimonios y debates públicos de familias.",
+      reviewsOfficialGva: "Ficha oficial de Conselleria (GVA)",
+      reviewsOfficialGvaDesc: "Registro administrativo oficial y oferta formativa verificada.",
+      reviewsSourceLabel: "Fuente:",
+      reviewsSourceForums: "Foros y Web",
+      reviewsOpenReviews: "Abrir reseñas",
+      reviewsSearchThreads: "Buscar debates",
+      reviewsViewOfficial: "Ver ficha oficial",
+      reviewsDisclaimer: "InfoEdu CV no aloja opiniones de texto libre de forma directa para proteger la privacidad de los usuarios (RGPD) y garantizar que las valoraciones provengan de fuentes públicas transparentes y contrastadas.",
+      viewAllInMunicipality: "Ver todos en",
+      socialMediaTitle: "Redes Sociales del Centro",
+      socialMediaSubtitle: "Canales oficiales de comunicación y perfiles sociales verificados",
+      socialMediaBadge: "Comunidad y Redes",
+      noSocialMediaTitle: "Sin redes sociales oficiales registradas",
+      noSocialMediaDesc: "Este centro docente no dispone de perfiles en redes sociales enlazados en el registro oficial o en su ficha actual.",
+      searchOnSocial: "Buscar perfiles en Google",
+      visitProfile: "Visitar perfil"
     },
     faq: {
       badge: "Preguntas Frecuentes",
@@ -377,7 +423,30 @@ export const translations: Record<Language, Translations> = {
       breadcrumbsHome: "Inici",
       relatedSchoolsTitle: "Altres centres educatius a",
       viewCenter: "Veure centre",
-      officialSourceNote: "Dades oficials de la Generalitat Valenciana (GVA) i Conselleria d'Educació."
+      officialSourceNote: "Dades oficials de la Generalitat Valenciana (GVA) i Conselleria d'Educació.",
+      reviewsTitle: "Opinions i Reputació del Centre",
+      reviewsSubtitle: "Consulta valoracions públiques, experiències i puntuacions reals de famílies i alumnes.",
+      reviewsBadge: "Reputació i Experiències",
+      reviewsGoogleMaps: "Veure opinions a Google Maps",
+      reviewsGoogleMapsDesc: "Puntuació d'estreles i ressenyes de la comunitat a Google Business.",
+      reviewsSearchExperiences: "Cercar experiències a la xarxa",
+      reviewsSearchExperiencesDesc: "Fòrums educatius, testimonis i debats públics de famílies.",
+      reviewsOfficialGva: "Fitxa oficial de Conselleria (GVA)",
+      reviewsOfficialGvaDesc: "Registre administratiu oficial i oferta formativa verificada.",
+      reviewsSourceLabel: "Font:",
+      reviewsSourceForums: "Fòrums i Web",
+      reviewsOpenReviews: "Obrir ressenyes",
+      reviewsSearchThreads: "Cercar debats",
+      reviewsViewOfficial: "Veure fitxa oficial",
+      reviewsDisclaimer: "InfoEdu CV no allotja opinions de text lliure de manera directa per a protegir la privacitat dels usuaris (RGPD) i garantir que les valoracions provenen de fonts públiques transparents i contrastades.",
+      viewAllInMunicipality: "Veure tots a",
+      socialMediaTitle: "Xarxes Socials del Centre",
+      socialMediaSubtitle: "Canals oficials de comunicació i perfils socials verificats",
+      socialMediaBadge: "Comunitat i Xarxes",
+      noSocialMediaTitle: "Sense xarxes socials oficials registrades",
+      noSocialMediaDesc: "Este centre educatiu no disposa de perfils en xarxes socials enllaçats en el registre oficial o en la seua fitxa actual.",
+      searchOnSocial: "Cercar perfils a Google",
+      visitProfile: "Visitar perfil"
     },
     faq: {
       badge: "Preguntes Freqüents",
@@ -520,7 +589,30 @@ export const translations: Record<Language, Translations> = {
       breadcrumbsHome: "Home",
       relatedSchoolsTitle: "Other educational institutions in",
       viewCenter: "View school",
-      officialSourceNote: "Official data from Generalitat Valenciana (GVA) and Conselleria d'Educació."
+      officialSourceNote: "Official data from Generalitat Valenciana (GVA) and Conselleria d'Educació.",
+      reviewsTitle: "Reviews & School Reputation",
+      reviewsSubtitle: "Check public ratings, experiences, and authentic feedback from families and students.",
+      reviewsBadge: "Reputation & Experiences",
+      reviewsGoogleMaps: "View reviews on Google Maps",
+      reviewsGoogleMapsDesc: "Star ratings and community reviews on Google Business profile.",
+      reviewsSearchExperiences: "Search experiences online",
+      reviewsSearchExperiencesDesc: "Educational forums, testimonials, and public community discussions.",
+      reviewsOfficialGva: "Official Conselleria Profile (GVA)",
+      reviewsOfficialGvaDesc: "Official administrative registry and verified educational programs.",
+      reviewsSourceLabel: "Source:",
+      reviewsSourceForums: "Forums & Web",
+      reviewsOpenReviews: "Open reviews",
+      reviewsSearchThreads: "Search discussions",
+      reviewsViewOfficial: "View official profile",
+      reviewsDisclaimer: "InfoEdu CV does not directly host user comments to protect user privacy (GDPR) and ensure reviews come from transparent and verified public platforms.",
+      viewAllInMunicipality: "View all in",
+      socialMediaTitle: "School Social Networks",
+      socialMediaSubtitle: "Official communication channels and verified social profiles",
+      socialMediaBadge: "Community & Social",
+      noSocialMediaTitle: "No official social media registered",
+      noSocialMediaDesc: "This educational center does not currently have official social media accounts linked.",
+      searchOnSocial: "Search profiles on Google",
+      visitProfile: "Visit profile"
     },
     faq: {
       badge: "Frequently Asked Questions",

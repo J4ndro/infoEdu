@@ -2,10 +2,11 @@
 
 import { Center } from '@/types';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, MapPin, Phone, Globe, BookOpen, GraduationCap, ExternalLink, ShieldCheck, Building, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Phone, Globe, BookOpen, GraduationCap, ExternalLink, ShieldCheck, Building, ArrowRight, Star, MessageSquare, Info } from 'lucide-react';
 import MapWrapper from '@/components/MapWrapper';
 import { useLanguage } from '@/context/LanguageContext';
 import { getCenterSlug } from '@/lib/slug';
+import SocialMediaSection from '@/components/SocialMediaSection';
 
 interface CentroDetailProps {
   center: Center;
@@ -295,6 +296,9 @@ export default function CentroDetail({ center, relatedCenters = [] }: CentroDeta
               )}
             </div>
 
+            {/* Official Social Media Section */}
+            <SocialMediaSection center={center} />
+
             {/* Educational Offer */}
             {center.levels && center.levels.length > 0 && (
               <div className="glass-panel rounded-2xl p-5 sm:p-8">
@@ -420,6 +424,122 @@ export default function CentroDetail({ center, relatedCenters = [] }: CentroDeta
 
         </div>
 
+        {/* Reviews and Community Reputation Module */}
+        <div className="mt-10 glass-panel rounded-2xl p-6 sm:p-8 relative overflow-hidden animate-fade-in-up">
+          {/* Subtle glowing accent */}
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 rounded-t-2xl"></div>
+
+          <div className="max-w-3xl mb-6">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase tracking-wider mb-2 border border-amber-500/20">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              {t.centerDetail.reviewsBadge}
+            </div>
+            <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+              {t.centerDetail.reviewsTitle}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {t.centerDetail.reviewsSubtitle}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* 1. Google Maps Reviews */}
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${center.name}, ${center.address}, ${center.municipality}`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-card p-5 rounded-xl group hover:border-amber-500/50 transition-all flex flex-col justify-between cursor-pointer"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg group-hover:scale-110 transition-transform">
+                    <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                    {t.centerDetail.reviewsSourceLabel} Google Maps
+                  </span>
+                </div>
+                <h4 className="font-bold text-gray-900 dark:text-white text-base group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  {t.centerDetail.reviewsGoogleMaps}
+                </h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
+                  {t.centerDetail.reviewsGoogleMapsDesc}
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-200/30 dark:border-white/5 flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-400">
+                <span>{t.centerDetail.reviewsOpenReviews}</span>
+                <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </div>
+            </a>
+
+            {/* 2. Search Online Community Experiences */}
+            <a
+              href={`https://www.google.com/search?q=${encodeURIComponent(`opiniones ${center.name} ${center.municipality}`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-card p-5 rounded-xl group hover:border-primary-500/50 transition-all flex flex-col justify-between cursor-pointer"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg group-hover:scale-110 transition-transform">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                    {t.centerDetail.reviewsSourceLabel} {t.centerDetail.reviewsSourceForums}
+                  </span>
+                </div>
+                <h4 className="font-bold text-gray-900 dark:text-white text-base group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                  {t.centerDetail.reviewsSearchExperiences}
+                </h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
+                  {t.centerDetail.reviewsSearchExperiencesDesc}
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-200/30 dark:border-white/5 flex items-center justify-between text-xs font-bold text-primary-600 dark:text-primary-400">
+                <span>{t.centerDetail.reviewsSearchThreads}</span>
+                <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </div>
+            </a>
+
+            {/* 3. Official GVA Conselleria Registry */}
+            <a
+              href={center.gvaUrl || `https://ceice.gva.es/web/centros-docentes/ficha-centro?codi=${center.id}`}
+              target="_blank"
+              rel="noreferrer"
+              className="glass-card p-5 rounded-xl group hover:border-emerald-500/50 transition-all flex flex-col justify-between cursor-pointer"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg group-hover:scale-110 transition-transform">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                    {t.centerDetail.reviewsSourceLabel} Generalitat GVA
+                  </span>
+                </div>
+                <h4 className="font-bold text-gray-900 dark:text-white text-base group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  {t.centerDetail.reviewsOfficialGva}
+                </h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
+                  {t.centerDetail.reviewsOfficialGvaDesc}
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-200/30 dark:border-white/5 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                <span>{t.centerDetail.reviewsViewOfficial}</span>
+                <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </div>
+            </a>
+          </div>
+
+          {/* Privacy & RGPD Transparency Note */}
+          <div className="mt-5 p-3.5 rounded-xl bg-slate-100/70 dark:bg-white/5 border border-slate-200/50 dark:border-white/5 flex items-start gap-2.5 text-xs text-gray-500 dark:text-gray-400">
+            <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              {t.centerDetail.reviewsDisclaimer}
+            </p>
+          </div>
+        </div>
+
         {/* SEO Interlinking Section: Related Centers in the same municipality */}
         {relatedCenters.length > 0 && (
           <div className="mt-14 pt-10 border-t border-slate-200/40 dark:border-white/5 animate-fade-in-up">
@@ -436,7 +556,7 @@ export default function CentroDetail({ center, relatedCenters = [] }: CentroDeta
                 href={`/?q=${encodeURIComponent(center.municipality)}`}
                 className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 dark:text-amber-400 transition-colors"
               >
-                <span>Ver todos en {center.municipality}</span>
+                <span>{t.centerDetail.viewAllInMunicipality} {center.municipality}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
