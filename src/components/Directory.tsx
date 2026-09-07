@@ -5,7 +5,7 @@ import { useMemo, useCallback, useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Center } from '@/types';
 import dynamic from 'next/dynamic';
-import { Search, Map as MapIcon, List as ListIcon, GraduationCap, Building, MapPin, ArrowRight, Navigation, Bookmark, Share2, X } from 'lucide-react';
+import { Search, Map as MapIcon, List as ListIcon, GraduationCap, Building, MapPin, ArrowRight, Navigation, Bookmark, Share2, X, Globe } from 'lucide-react';
 
 const MapWrapper = dynamic(() => import('./MapWrapper'), {
   ssr: false,
@@ -564,10 +564,18 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     
                     <div className="p-6 flex-grow flex flex-col pt-7">
                       <div className="flex justify-between items-start mb-4">
-                         <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase border border-slate-200/50 dark:border-white/10 bg-white/40 dark:bg-white/5 text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                           <Building className="w-3 h-3" />
-                           {center.type}
-                         </span>
+                         <div className="flex items-center gap-1.5 flex-wrap">
+                           <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase border border-slate-200/50 dark:border-white/10 bg-white/40 dark:bg-white/5 text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                             <Building className="w-3 h-3" />
+                             {center.type}
+                           </span>
+                           {center.hasCustomUrl && (
+                             <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 uppercase tracking-wider flex items-center gap-1 shadow-2xs">
+                               <Globe className="w-2.5 h-2.5" />
+                               Web Propia
+                             </span>
+                           )}
+                         </div>
                          
                          {center.distance !== undefined && (
                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center gap-1 border border-emerald-500/20 dark:border-emerald-500/10">
@@ -604,11 +612,22 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                       </div>
                     </div>
                     
-                    <div className="p-4 bg-slate-550/10 dark:bg-white/5 border-t border-slate-200/30 dark:border-white/5 mt-auto">
-                      <Link href={`/centro/${center.id}`} className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
+                    <div className="p-4 bg-slate-550/10 dark:bg-white/5 border-t border-slate-200/30 dark:border-white/5 mt-auto flex gap-2">
+                      <Link href={`/centro/${center.id}`} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
                         Explorar centro
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </Link>
+                      {center.url && (
+                        <a
+                          href={center.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          title={center.hasCustomUrl ? 'Abrir web oficial del centro' : 'Abrir web / ficha oficial'}
+                          className="flex items-center justify-center px-3.5 rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-xs hover:-translate-y-0.5 cursor-pointer"
+                        >
+                          <Globe className="w-4 h-4" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}
