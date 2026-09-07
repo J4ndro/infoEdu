@@ -3,13 +3,18 @@ import { Readable } from 'stream';
 import { Center, FPCycle } from '@/types';
 import { cache } from 'react';
 import privateWebsites from '@/data/privateWebsites.json';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 const privateWebsitesMap = privateWebsites as Record<string, string>;
 
 const CENTROS_URL = 'https://dadesobertes.gva.es/dataset/68eb1d94-76d3-4305-8507-e1aab7717d0e/resource/1aa53c3a-4639-41aa-ac85-d58254c428c0/download/centros-docentes-de-la-comunitat-valenciana.csv';
 const FP_URL = 'https://dadesobertes.gva.es/dataset/a2183efe-f62c-48ec-bdbe-22a4b63c3832/resource/79af67de-71a2-48b1-bd6d-57a2996e2669/download/alumnos-matriculados-fp_2025.csv';
 
-// Variables globales para caché en memoria (sobrevive en la instancia del contenedor de Vercel)
+const DISK_CACHE_PATH = path.join(os.tmpdir(), 'infoedu_centers_v2.json');
+
+// Variables globales para caché en memoria (sobrevive en la instancia del contenedor)
 let cachedCenters: Center[] | null = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
@@ -19,6 +24,22 @@ export const getCenters = cache(async (): Promise<Center[]> => {
   if (cachedCenters && (now - lastFetchTime < CACHE_TTL)) {
     console.log("⚡ [CACHE SERVIDOR] Retornando centros educativos desde memoria caché");
     return cachedCenters;
+  }
+
+  // Verificar caché persistente en disco (permite compartir datos entre workers de build)
+  try {
+    if (fs.existsSync(DISK_CACHE_PATH)) {
+      const stats = fs.statSync(DISK_CACHE_PATH);
+      if (now - stats.mtimeMs < CACHE_TTL) {
+        const fileData = fs.readFileSync(DISK_CACHE_PATH, 'utf-8');
+        cachedCenters = JSON.parse(fileData);
+        lastFetchTime = stats.mtimeMs;
+        console.log("⚡ [CACHE DISCO] Retornando centros educativos desde caché en disco");
+        return cachedCenters as Center[];
+      }
+    }
+  } catch (e) {
+    console.warn("⚠️ [CACHE DISCO] Error al leer caché en disco:", e);
   }
 
   console.log("🌐 [FETCH SERVIDOR] Descargando y procesando nuevos datos de GVA");
@@ -58,44 +79,46 @@ export const getCenters = cache(async (): Promise<Center[]> => {
             return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
           };
 
-          const key = `${family}|${grade}|${name}`;
-          fpMap.get(codCentro)!.set(key, { 
-            family: formatName(family), 
-            grade, 
-            name: formatName(name) 
+          const key = `${grade}-${name}`;
+          fpMap.get(codCentro)!.set(key, {
+            family: formatName(family),
+            grade: grade,
+            name: formatName(name)
           });
         })
         .on('end', resolve)
         .on('error', reject);
     });
 
-    // Fetch Centers data
-    const response = await fetch(CENTROS_URL, { next: { revalidate: 86400 } });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch centers data: ${response.statusText}`);
+    // Fetch Centros data
+    const centrosResponse = await fetch(CENTROS_URL, { next: { revalidate: 86400 } });
+    if (!centrosResponse.ok) {
+      throw new Error(`Failed to fetch Centros data: ${centrosResponse.statusText}`);
     }
-    const text = await response.text();
+    const centrosText = await centrosResponse.text();
+
     const results: Center[] = [];
 
     await new Promise<void>((resolve, reject) => {
-      Readable.from(text)
+      Readable.from(centrosText)
         .pipe(csv({ separator: ';' }))
         .on('data', (data) => {
-          // Basic filtering to ensure valid coordinates
-          if (!data.latitud || !data.longitud) return;
-
-          const lat = parseFloat(data.latitud.replace(',', '.'));
-          const lng = parseFloat(data.longitud.replace(',', '.'));
+          // Parse coordinates
+          const lat = parseFloat(data.latitud?.replace(',', '.'));
+          const lng = parseFloat(data.longitud?.replace(',', '.'));
 
           if (isNaN(lat) || isNaN(lng)) return;
 
-          // Infer levels based on denominacion_generica_es
-          const denominacionGenerica = (data.denominacion_generica_es || '').toUpperCase();
+          // Determine education levels
           const niveles: string[] = [];
+          const denominacionGenerica = (data.denominacion_generica_es || '').toUpperCase();
+
           if (denominacionGenerica.includes('INFANTIL')) niveles.push('Infantil');
           if (denominacionGenerica.includes('PRIMARIA')) niveles.push('Primaria');
-          if (denominacionGenerica.includes('SECUNDARIA')) niveles.push('ESO');
-          if (denominacionGenerica.includes('BACHILLERATO') || denominacionGenerica.includes('SECUNDARIA')) niveles.push('Bachillerato');
+          if (denominacionGenerica.includes('SECUNDARIA') || denominacionGenerica.includes('I.E.S.')) {
+            niveles.push('ESO');
+            niveles.push('Bachillerato');
+          }
 
           // Check actual FP cycles
           const fpCyclesMap = fpMap.get(data.codigo);
@@ -141,11 +164,29 @@ export const getCenters = cache(async (): Promise<Center[]> => {
 
     cachedCenters = results;
     lastFetchTime = Date.now();
+    try {
+      fs.writeFileSync(DISK_CACHE_PATH, JSON.stringify(results));
+      console.log(`💾 [CACHE DISCO] Guardados ${results.length} centros en caché de disco (${DISK_CACHE_PATH})`);
+    } catch (e) {
+      console.warn("⚠️ [CACHE DISCO] No se pudo guardar caché en disco:", e);
+    }
+
     console.log(`✅ [CACHE SERVIDOR] Guardados ${results.length} centros en caché de memoria`);
 
     return results;
   } catch (error) {
     console.error("❌ [API ERROR] Fallo al descargar/procesar datos de la GVA:", error);
+    // Intentar fallback en disco si la descarga falló
+    try {
+      if (fs.existsSync(DISK_CACHE_PATH)) {
+        const fileData = fs.readFileSync(DISK_CACHE_PATH, 'utf-8');
+        cachedCenters = JSON.parse(fileData);
+        console.log("⚠️ [FALLBACK DISCO] Retornando centros desde caché persistente en disco");
+        return cachedCenters as Center[];
+      }
+    } catch {
+      // ignore
+    }
     if (cachedCenters) {
       console.log("⚠️ [FALLBACK CACHÉ] Retornando versión anterior de centros en memoria");
       return cachedCenters;
