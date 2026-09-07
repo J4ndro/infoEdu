@@ -7,6 +7,7 @@ import { Center } from '@/types';
 import dynamic from 'next/dynamic';
 import { Search, Map as MapIcon, List as ListIcon, GraduationCap, Building, MapPin, ArrowRight, Navigation, Share2, X, Globe } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { getCenterSlug } from '@/lib/slug';
 
 const MapWrapper = dynamic(() => import('./MapWrapper'), {
   ssr: false,
@@ -643,7 +644,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                     </div>
                     
                     <div className="p-4 bg-slate-550/10 dark:bg-white/5 border-t border-slate-200/30 dark:border-white/5 mt-auto flex gap-2">
-                      <Link href={`/centro/${center.id}`} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
+                      <Link href={`/centro/${getCenterSlug(center)}`} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 via-[#d38c28] to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer">
                         {t.cards.exploreCenter}
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </Link>

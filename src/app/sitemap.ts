@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getCenters } from '@/lib/api';
+import { getCenterSlug } from '@/lib/slug';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://info-edu-cv.vercel.app';
@@ -7,19 +8,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const centers = await getCenters();
 
-    const centerEntries: MetadataRoute.Sitemap = centers.map((center) => ({
-      url: `${baseUrl}/centro/${center.id}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: {
-        languages: {
-          es: `${baseUrl}/centro/${center.id}`,
-          'ca-ES': `${baseUrl}/centro/${center.id}?lang=va`,
-          en: `${baseUrl}/centro/${center.id}?lang=en`,
+    const centerEntries: MetadataRoute.Sitemap = centers.map((center) => {
+      const slug = getCenterSlug(center);
+      return {
+        url: `${baseUrl}/centro/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.8,
+        alternates: {
+          languages: {
+            es: `${baseUrl}/centro/${slug}`,
+            'ca-ES': `${baseUrl}/centro/${slug}?lang=va`,
+            en: `${baseUrl}/centro/${slug}?lang=en`,
+          }
         }
-      }
-    }));
+      };
+    });
 
     return [
       {

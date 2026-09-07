@@ -100,6 +100,10 @@ export interface Translations {
     humanitiesSocial: string;
     artsGeneral: string;
     noFpDetails: string;
+    breadcrumbsHome: string;
+    relatedSchoolsTitle: string;
+    viewCenter: string;
+    officialSourceNote: string;
   };
   faq: {
     badge: string;
@@ -226,7 +230,11 @@ export const translations: Record<Language, Translations> = {
       scienceTech: "Ciencias y Tecnología",
       humanitiesSocial: "Humanidades y Ciencias Sociales",
       artsGeneral: "Artes / General",
-      noFpDetails: "No hay detalles de ciclos formativos disponibles para este centro."
+      noFpDetails: "No hay detalles de ciclos formativos disponibles para este centro.",
+      breadcrumbsHome: "Inicio",
+      relatedSchoolsTitle: "Otros centros educativos en",
+      viewCenter: "Ver centro",
+      officialSourceNote: "Datos oficiales de la Generalitat Valenciana (GVA) y Conselleria d'Educació."
     },
     faq: {
       badge: "Preguntas Frecuentes",
@@ -365,7 +373,11 @@ export const translations: Record<Language, Translations> = {
       scienceTech: "Ciències i Tecnologia",
       humanitiesSocial: "Humanitats i Ciències Socials",
       artsGeneral: "Arts / General",
-      noFpDetails: "No hi ha detalls de cicles formatius disponibles per a este centre."
+      noFpDetails: "No hi ha detalls de cicles formatius disponibles per a este centre.",
+      breadcrumbsHome: "Inici",
+      relatedSchoolsTitle: "Altres centres educatius a",
+      viewCenter: "Veure centre",
+      officialSourceNote: "Dades oficials de la Generalitat Valenciana (GVA) i Conselleria d'Educació."
     },
     faq: {
       badge: "Preguntes Freqüents",
@@ -504,7 +516,11 @@ export const translations: Record<Language, Translations> = {
       scienceTech: "Science & Technology",
       humanitiesSocial: "Humanities & Social Sciences",
       artsGeneral: "Arts / General",
-      noFpDetails: "No specific vocational training cycles listed for this school."
+      noFpDetails: "No specific vocational training cycles listed for this school.",
+      breadcrumbsHome: "Home",
+      relatedSchoolsTitle: "Other educational institutions in",
+      viewCenter: "View school",
+      officialSourceNote: "Official data from Generalitat Valenciana (GVA) and Conselleria d'Educació."
     },
     faq: {
       badge: "Frequently Asked Questions",

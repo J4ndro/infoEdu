@@ -2,16 +2,20 @@
 
 import { Center } from '@/types';
 import Link from 'next/link';
-import { ChevronLeft, MapPin, Phone, Globe, BookOpen, GraduationCap, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Phone, Globe, BookOpen, GraduationCap, ExternalLink, ShieldCheck, Building, ArrowRight } from 'lucide-react';
 import MapWrapper from '@/components/MapWrapper';
 import { useLanguage } from '@/context/LanguageContext';
+import { getCenterSlug } from '@/lib/slug';
 
 interface CentroDetailProps {
   center: Center;
+  relatedCenters?: Center[];
 }
 
-export default function CentroDetail({ center }: CentroDetailProps) {
+export default function CentroDetail({ center, relatedCenters = [] }: CentroDetailProps) {
   const { t, language } = useLanguage();
+  const canonicalSlug = getCenterSlug(center);
+  const provinceName = center.province.split('/')[0];
 
   const getNaturalezaBadge = (type: string) => {
     switch (type?.toUpperCase()) {
@@ -59,11 +63,12 @@ export default function CentroDetail({ center }: CentroDetailProps) {
     return 'bg-primary-50 border-primary-100 dark:bg-primary-900/10 dark:border-primary-800/30';
   };
 
-  const jsonLd = {
+  // Schema.org: EducationalOrganization
+  const jsonLdOrg = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     "name": center.name,
-    "description": `${getLocalizedType(center.type)} - ${center.municipality}`,
+    "description": `${getLocalizedType(center.type)} en ${center.municipality} (${provinceName})`,
     "inLanguage": language === 'va' ? 'ca' : language,
     "image": "https://info-edu-cv.vercel.app/logo.png",
     "logo": "https://info-edu-cv.vercel.app/logo.png",
@@ -72,7 +77,7 @@ export default function CentroDetail({ center }: CentroDetailProps) {
       "streetAddress": center.address,
       "addressLocality": center.municipality,
       "postalCode": center.zipCode,
-      "addressRegion": center.province.split('/')[0],
+      "addressRegion": provinceName,
       "addressCountry": "ES"
     },
     "telephone": center.phone || undefined,
@@ -84,6 +89,38 @@ export default function CentroDetail({ center }: CentroDetailProps) {
     }
   };
 
+  // Schema.org: BreadcrumbList for rich snippets in Google
+  const jsonLdBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": t.centerDetail.breadcrumbsHome,
+        "item": "https://info-edu-cv.vercel.app"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": provinceName,
+        "item": `https://info-edu-cv.vercel.app/?prov=${encodeURIComponent(center.province)}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": center.municipality,
+        "item": `https://info-edu-cv.vercel.app/?q=${encodeURIComponent(center.municipality)}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": center.name,
+        "item": `https://info-edu-cv.vercel.app/centro/${canonicalSlug}`
+      }
+    ]
+  };
+
   const getWebsiteTitle = () => {
     if (center.hasCustomUrl) return t.centerDetail.officialWebsite;
     if (center.type === 'Público') return t.centerDetail.gvaPortal;
@@ -91,21 +128,48 @@ export default function CentroDetail({ center }: CentroDetailProps) {
   };
 
   return (
-    <div className="min-h-screen bg-transparent py-8 transition-colors">
+    <div className="min-h-screen bg-transparent py-6 transition-colors">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }}
+      />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Back Button */}
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 text-gray-500 hover:text-primary-700 dark:text-gray-400 dark:hover:text-primary-400 font-bold mb-8 transition-colors text-sm uppercase tracking-wide cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          {t.centerDetail.backToSearch}
-        </Link>
+        {/* Navigation & Breadcrumbs Row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          {/* Back Button */}
+          <Link 
+            href="/"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-primary-700 dark:text-gray-400 dark:hover:text-primary-400 font-bold transition-colors text-sm uppercase tracking-wide cursor-pointer shrink-0"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            {t.centerDetail.backToSearch}
+          </Link>
+
+          {/* Visual Breadcrumbs for SEO and UX */}
+          <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500">
+            <Link href="/" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              {t.centerDetail.breadcrumbsHome}
+            </Link>
+            <ChevronRight className="w-3 h-3 text-gray-400 shrink-0" />
+            <Link href={`/?prov=${encodeURIComponent(center.province)}`} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              {provinceName}
+            </Link>
+            <ChevronRight className="w-3 h-3 text-gray-400 shrink-0" />
+            <Link href={`/?q=${encodeURIComponent(center.municipality)}`} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              {center.municipality}
+            </Link>
+            <ChevronRight className="w-3 h-3 text-gray-400 shrink-0" />
+            <span className="text-gray-700 dark:text-gray-300 font-bold truncate max-w-[200px] sm:max-w-xs">
+              {center.name}
+            </span>
+          </nav>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
@@ -119,12 +183,16 @@ export default function CentroDetail({ center }: CentroDetailProps) {
 
               <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div className="flex-1 min-w-0 pt-2">
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-4 flex-wrap">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase border ${getNaturalezaBadge(center.type)}`}>
                       {getLocalizedType(center.type)}
                     </span>
                     <span className="text-sm font-mono text-gray-400 dark:text-gray-500">
                       {t.centerDetail.code} {center.id}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                      <ShieldCheck className="w-3 h-3" />
+                      Registro Oficial GVA
                     </span>
                   </div>
                   <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2 leading-tight tracking-tight">
@@ -351,6 +419,67 @@ export default function CentroDetail({ center }: CentroDetailProps) {
           </div>
 
         </div>
+
+        {/* SEO Interlinking Section: Related Centers in the same municipality */}
+        {relatedCenters.length > 0 && (
+          <div className="mt-14 pt-10 border-t border-slate-200/40 dark:border-white/5 animate-fade-in-up">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {t.centerDetail.relatedSchoolsTitle} <span className="text-primary-600 dark:text-primary-400">{center.municipality}</span>
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {t.centerDetail.officialSourceNote}
+                </p>
+              </div>
+              <Link
+                href={`/?q=${encodeURIComponent(center.municipality)}`}
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 dark:text-amber-400 transition-colors"
+              >
+                <span>Ver todos en {center.municipality}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {relatedCenters.map((rel) => {
+                const relSlug = getCenterSlug(rel);
+                return (
+                  <Link
+                    key={rel.id}
+                    href={`/centro/${relSlug}`}
+                    className="glass-card p-4 rounded-xl group hover:border-amber-500/50 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border border-slate-200/50 dark:border-white/10 bg-white/40 dark:bg-white/5 text-gray-700 dark:text-gray-300">
+                          {getLocalizedType(rel.type)}
+                        </span>
+                        {rel.hasCustomUrl && (
+                          <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 uppercase">
+                            Web
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                        {rel.name}
+                      </h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                        {rel.address}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-200/30 dark:border-white/5 flex items-center justify-between text-xs font-bold text-primary-600 dark:text-primary-400">
+                      <span>{t.centerDetail.viewCenter}</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
