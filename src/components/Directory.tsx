@@ -243,7 +243,11 @@ export default function Directory({ initialCenters }: DirectoryProps) {
       const matchesZip = zipCode ? center.zipCode.includes(zipCode) : true;
       const matchesProvince = selectedProvince ? center.province === selectedProvince : true;
       const matchesLevel = selectedLevel ? center.levels.includes(selectedLevel) : true;
-      const matchesTitularidad = selectedTitularidad ? center.type.toLowerCase().includes(selectedTitularidad.toLowerCase()) : true;
+      const matchesTitularidad = selectedTitularidad 
+        ? (selectedTitularidad === 'privado_todos' 
+            ? (center.type === 'Privado' || center.type === 'Concertado')
+            : center.type.toLowerCase().includes(selectedTitularidad.toLowerCase()))
+        : true;
       
       let matchesFp = true;
       if (selectedLevel === 'FP') {
@@ -368,6 +372,71 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               </div>
             </div>
 
+            {/* Quick Public / Private Toggle Pills */}
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-200/40 dark:border-white/5 flex-wrap">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mr-1">
+                Centro:
+              </span>
+              <button
+                type="button"
+                onClick={() => setParam('tit', '')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  !selectedTitularidad
+                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                    : 'bg-white/60 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/10'
+                }`}
+              >
+                Todos
+              </button>
+              <button
+                type="button"
+                onClick={() => setParam('tit', 'Público')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedTitularidad === 'Público'
+                    ? 'bg-primary-600 text-white shadow-xs'
+                    : 'bg-white/60 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/10'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-primary-400 inline-block"></span>
+                Público
+              </button>
+              <button
+                type="button"
+                onClick={() => setParam('tit', 'Privado')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedTitularidad === 'Privado'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'bg-white/60 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/10'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                Privado
+              </button>
+              <button
+                type="button"
+                onClick={() => setParam('tit', 'Concertado')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedTitularidad === 'Concertado'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'bg-white/60 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/10'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-purple-400 inline-block"></span>
+                Concertado
+              </button>
+              <button
+                type="button"
+                onClick={() => setParam('tit', 'privado_todos')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedTitularidad === 'privado_todos'
+                    ? 'bg-gradient-to-r from-amber-600 to-purple-600 text-white shadow-xs'
+                    : 'bg-white/60 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/10'
+                }`}
+              >
+                Privado y Concertado
+              </button>
+            </div>
+
             {/* Row 2: Categories */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
               <div>
@@ -386,7 +455,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               </div>
               
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Tipo</label>
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Nivel Educativo</label>
                 <select 
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
@@ -403,17 +472,18 @@ export default function Directory({ initialCenters }: DirectoryProps) {
               </div>
               
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Titularidad</label>
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-1.5">Centro Público / Privado</label>
                 <select 
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-900/80 text-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all font-semibold text-gray-900 dark:text-white appearance-none cursor-pointer shadow-xs"
                   style={customSelectStyles}
                   value={selectedTitularidad}
                   onChange={(e) => setParam('tit', e.target.value)}
                 >
-                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Todos</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="">Público y Privado (Todos)</option>
                   <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Público">Público</option>
                   <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Privado">Privado</option>
                   <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="Concertado">Concertado</option>
+                  <option className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" value="privado_todos">Privado y Concertado</option>
                 </select>
               </div>
             </div>
