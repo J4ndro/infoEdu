@@ -20,6 +20,7 @@ const MapWrapper = dynamic(() => import('./MapWrapper'), {
 
 interface DirectoryProps {
   initialCenters: Center[];
+  totalCount?: number;
 }
 
 function deg2rad(deg: number): number {
@@ -38,11 +39,56 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c; // Distance in km
 }
 
-export default function Directory({ initialCenters }: DirectoryProps) {
+export default function Directory({ initialCenters, totalCount }: DirectoryProps) {
   const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // High Performance Optimization:
+  // Starts with initial lightweight slice (24 centers) for instant paint & minimal initial DOM.
+  // Seamlessly loads full directory in background via requestIdleCallback.
+  const [allCenters, setAllCenters] = useState<Center[]>(initialCenters);
+  const [isFullDataLoaded, setIsFullDataLoaded] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(24);
+
+  // Background fetch full catalog
+  useEffect(() => {
+    let isMounted = true;
+    const loadFullCatalog = async () => {
+      try {
+        const res = await fetch('/api/centers');
+        if (res.ok) {
+          const fullData = await res.json();
+          if (isMounted && Array.isArray(fullData) && fullData.length > 0) {
+            setAllCenters(fullData);
+            setIsFullDataLoaded(true);
+          }
+        }
+      } catch (err) {
+        console.warn('Background centers fetch fallback to initial slice', err);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => loadFullCatalog(), { timeout: 2500 });
+      } else {
+        setTimeout(loadFullCatalog, 300);
+      }
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Sync if initialCenters changes via server navigation
+  useEffect(() => {
+    if (!isFullDataLoaded) {
+      setAllCenters(initialCenters);
+    }
+  }, [initialCenters, isFullDataLoaded]);
 
   // Location State
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
@@ -157,15 +203,21 @@ export default function Directory({ initialCenters }: DirectoryProps) {
     return count;
   }, [query, zipCode, selectedProvince, selectedLevel, selectedTitularidad, cycleQuery, selectedFamily, selectedFpGrade, userLocation]);
 
+  // Reset visible count when filter changes
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [query, zipCode, selectedProvince, selectedLevel, selectedTitularidad, cycleQuery, selectedFamily, selectedFpGrade, userLocation]);
+
   const allFamilies = useMemo(() => {
+    if (selectedLevel !== 'FP') return [];
     const families = new Set<string>();
-    initialCenters.forEach(center => {
+    allCenters.forEach(center => {
       center.fpCycles?.forEach(cycle => {
         families.add(cycle.family);
       });
     });
     return Array.from(families).sort();
-  }, [initialCenters]);
+  }, [allCenters, selectedLevel]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -210,10 +262,10 @@ export default function Directory({ initialCenters }: DirectoryProps) {
         const lng = position.coords.longitude;
         setUserLocation([lat, lng]);
         
-        let closestCenter = initialCenters[0];
+        let closestCenter = allCenters[0];
         let minDistance = Infinity;
         
-        for (const center of initialCenters) {
+        for (const center of allCenters) {
           const dist = calculateDistance(lat, lng, center.lat, center.lng);
           if (dist < minDistance) {
             minDistance = dist;
@@ -235,7 +287,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
 
   // Filter centers based on criteria
   const filteredCenters = useMemo(() => {
-    let results = initialCenters.filter(center => {
+    let results = allCenters.filter(center => {
       const matchesQuery = 
         center.name.toLowerCase().includes(query.toLowerCase()) ||
         center.municipality.toLowerCase().includes(query.toLowerCase());
@@ -275,8 +327,13 @@ export default function Directory({ initialCenters }: DirectoryProps) {
       })).sort((a, b) => (a.distance || 0) - (b.distance || 0));
     }
 
-    return results.slice(0, 100);
-  }, [initialCenters, query, zipCode, selectedProvince, selectedLevel, selectedTitularidad, cycleQuery, selectedFamily, selectedFpGrade, userLocation]);
+    return results;
+  }, [allCenters, query, zipCode, selectedProvince, selectedLevel, selectedTitularidad, cycleQuery, selectedFamily, selectedFpGrade, userLocation]);
+
+  // Paginated visible slice for instant mobile rendering
+  const visibleCenters = useMemo(() => {
+    return filteredCenters.slice(0, visibleCount);
+  }, [filteredCenters, visibleCount]);
 
   const customSelectStyles = {
     backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")',
@@ -587,7 +644,7 @@ export default function Directory({ initialCenters }: DirectoryProps) {
           {viewMode === 'list' ? (
             <div className="w-full pb-10">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCenters.map(center => (
+                {visibleCenters.map(center => (
                   <div key={center.id} className="glass-card group relative rounded-2xl overflow-hidden flex flex-col h-full animate-fade-in-up">
                     <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#114b5f] via-[#d38c28] to-[#f59e0b]"></div>
                     
@@ -672,6 +729,24 @@ export default function Directory({ initialCenters }: DirectoryProps) {
                   </div>
                 )}
               </div>
+
+              {/* Pagination / Load More */}
+              {filteredCenters.length > visibleCount && (
+                <div className="mt-10 mb-4 text-center flex flex-col items-center gap-3">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    {t.cards.showingCentersCount
+                      .replace('{count}', String(visibleCenters.length))
+                      .replace('{total}', String(filteredCenters.length))}
+                  </p>
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 24)}
+                    className="px-6 py-3 rounded-xl font-bold text-sm bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 text-gray-900 dark:text-white border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <span>{t.cards.loadMoreCenters}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="w-full h-full glass-panel rounded-2xl overflow-hidden animate-fade-in-up">

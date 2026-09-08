@@ -5,11 +5,44 @@ import { Suspense } from 'react';
 
 export const revalidate = 86400; // Revalidate every 24 hours
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | undefined }>;
+}) {
+  const params = searchParams ? await searchParams : {};
   const centers = await getCenters();
 
-  // Optimizar el payload enviado al cliente para reducir el tamaño del DOM y el HTML
-  const optimizedCenters = centers.map(c => ({
+  // Filter on server if search parameters are present in URL
+  let filtered = centers;
+  if (params.q) {
+    const q = params.q.toLowerCase();
+    filtered = filtered.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.municipality.toLowerCase().includes(q)
+    );
+  }
+  if (params.prov) {
+    filtered = filtered.filter((c) => c.province === params.prov);
+  }
+  if (params.level) {
+    filtered = filtered.filter((c) => c.levels.includes(params.level!));
+  }
+  if (params.tit) {
+    if (params.tit === 'privado_todos') {
+      filtered = filtered.filter(
+        (c) => c.type === 'Privado' || c.type === 'Concertado'
+      );
+    } else {
+      filtered = filtered.filter((c) =>
+        c.type.toLowerCase().includes(params.tit!.toLowerCase())
+      );
+    }
+  }
+
+  // Optimize initial slice (first 24 centers) to keep initial HTML under 40 KB
+  const initialCenters = filtered.slice(0, 24).map((c) => ({
     id: c.id,
     name: c.name,
     type: c.type,
@@ -23,11 +56,12 @@ export default async function Home() {
     url: c.url,
     hasCustomUrl: c.hasCustomUrl,
     gvaUrl: c.gvaUrl,
-    fpCycles: c.fpCycles?.map(fp => ({
+    socialMedia: c.socialMedia,
+    fpCycles: c.fpCycles?.map((fp) => ({
       family: fp.family,
       grade: fp.grade,
-      name: fp.name
-    }))
+      name: fp.name,
+    })),
   }));
 
   const jsonLd = {
@@ -62,7 +96,7 @@ export default async function Home() {
       />
       <h1 className="sr-only">Buscador de Centros Educativos y FP de la Comunitat Valenciana | Cercador de Centres Educatius | InfoEdu CV</h1>
       <Suspense fallback={<div className="flex items-center justify-center h-[calc(100vh-80px)] font-bold text-gray-500">Cargando directorio...</div>}>
-        <Directory initialCenters={optimizedCenters} />
+        <Directory initialCenters={initialCenters} totalCount={centers.length} />
       </Suspense>
       <FAQ />
     </>

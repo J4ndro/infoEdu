@@ -101,11 +101,11 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className={`${inter.className} bg-gradient-to-br from-slate-50 via-sky-50 to-indigo-50 dark:from-[#060814] dark:via-[#060814] dark:to-[#060814] text-slate-900 dark:text-slate-100 flex flex-col min-h-screen transition-colors relative overflow-x-hidden`}>
         {/* Ambient background glow elements for Liquid Glass Effect with Teal & Logo Orange accents */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-[-5%] left-[10%] w-[500px] h-[500px] rounded-full bg-cyan-200/30 dark:bg-purple-600/15 blur-[100px]" />
-          <div className="absolute top-[20%] right-[10%] w-[450px] h-[450px] rounded-full bg-amber-200/25 dark:bg-amber-600/10 blur-[100px]" />
-          <div className="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] rounded-full bg-teal-200/20 dark:bg-emerald-600/5 blur-[110px]" />
-          <div className="absolute bottom-[-5%] right-[10%] w-[400px] h-[400px] rounded-full bg-amber-100/30 dark:bg-amber-700/10 blur-[100px]" />
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 transform-gpu">
+          <div className="absolute top-[-5%] left-[10%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] rounded-full bg-cyan-200/30 dark:bg-purple-600/15 blur-[60px] md:blur-[100px]" />
+          <div className="absolute top-[20%] right-[10%] w-[250px] md:w-[450px] h-[250px] md:h-[450px] rounded-full bg-amber-200/25 dark:bg-amber-600/10 blur-[60px] md:blur-[100px]" />
+          <div className="hidden md:block absolute bottom-[20%] left-[10%] w-[500px] h-[500px] rounded-full bg-teal-200/20 dark:bg-emerald-600/5 blur-[100px]" />
+          <div className="hidden md:block absolute bottom-[-5%] right-[10%] w-[400px] h-[400px] rounded-full bg-amber-100/30 dark:bg-amber-700/10 blur-[100px]" />
         </div>
 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

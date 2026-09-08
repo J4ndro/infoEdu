@@ -76,6 +76,8 @@ export interface Translations {
     openOfficialWeb: string;
     noCentersFound: string;
     tryChangingFilters: string;
+    loadMoreCenters: string;
+    showingCentersCount: string;
   };
   centerDetail: {
     backToSearch: string;
@@ -229,7 +231,9 @@ export const translations: Record<Language, Translations> = {
       openWebsite: "Abrir web oficial del centro",
       openOfficialWeb: "Abrir web / ficha oficial",
       noCentersFound: "No se encontraron centros",
-      tryChangingFilters: "Prueba a cambiar los filtros de búsqueda."
+      tryChangingFilters: "Prueba a cambiar los filtros de búsqueda.",
+      loadMoreCenters: "Cargar más centros",
+      showingCentersCount: "Mostrando {shown} de {total} centros"
     },
     centerDetail: {
       backToSearch: "Volver al buscador",
@@ -395,7 +399,9 @@ export const translations: Record<Language, Translations> = {
       openWebsite: "Obrir web oficial del centre",
       openOfficialWeb: "Obrir web / fitxa oficial",
       noCentersFound: "No s'han trobat centres",
-      tryChangingFilters: "Prova a canviar els filtres de cerca."
+      tryChangingFilters: "Prova a canviar els filtres de cerca.",
+      loadMoreCenters: "Carregar més centres",
+      showingCentersCount: "Mostrant {shown} de {total} centres"
     },
     centerDetail: {
       backToSearch: "Tornar al cercador",
@@ -561,7 +567,9 @@ export const translations: Record<Language, Translations> = {
       openWebsite: "Open school's official website",
       openOfficialWeb: "Open website / official profile",
       noCentersFound: "No schools found",
-      tryChangingFilters: "Try adjusting your search filters."
+      tryChangingFilters: "Try adjusting your search filters.",
+      loadMoreCenters: "Load more schools",
+      showingCentersCount: "Showing {shown} of {total} schools"
     },
     centerDetail: {
       backToSearch: "Back to search",
